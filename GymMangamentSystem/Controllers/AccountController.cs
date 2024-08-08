@@ -128,7 +128,6 @@ namespace GymMangamentSystem.Apis.Controllers
             return Ok(result);
         }
 
-
         [HttpPost("resend-confirmation-email")]
         public async Task<IActionResult> ResendConfirmationEmail(string email)
         {
