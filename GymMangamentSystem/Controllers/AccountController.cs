@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Errors;
+﻿using GymMangamentSystem.Apis.Helpers;
+using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Auth;
 using GymMangamentSystem.Core.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -118,15 +119,15 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest("Invalid user ID.");
             }
 
+
             var result = await _accountService.ChangePasswordAsync(userId, dto.OldPassword, dto.NewPassword);
-
-            if (result.StatusCode == 200)
+            if (result.StatusCode == 400)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
-
-            return StatusCode(result.Data != null ? result.StatusCode.Value : 500, result.Message);
+            return Ok(result);
         }
+
 
         [HttpPost("resend-confirmation-email")]
         public async Task<IActionResult> ResendConfirmationEmail(string email)

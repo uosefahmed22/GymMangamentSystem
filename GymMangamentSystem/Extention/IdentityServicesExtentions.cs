@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using System.Text.Json;
 
 namespace GymMangamentSystem.Apis.Extention
 {
@@ -45,6 +46,23 @@ namespace GymMangamentSystem.Apis.Extention
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:key"]))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+                        var result = JsonSerializer.Serialize(new
+                        {
+                            StatusCode = StatusCodes.Status401Unauthorized,
+                            Message = "You are not authorized to access this resource."
+                        });
+
+                        return context.Response.WriteAsync(result);
+                    }
                 };
             });
             services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
