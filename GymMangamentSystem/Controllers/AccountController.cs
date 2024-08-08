@@ -25,11 +25,14 @@ namespace GymMangamentSystem.Apis.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             var result = await _accountService.LoginAsync(dto);
+
             if (result.StatusCode == 400)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
+
             return Ok(result);
         }
 
@@ -43,7 +46,7 @@ namespace GymMangamentSystem.Apis.Controllers
             var result = await _accountService.RegisterAsync(model, GenerateCallBackUrl);
             if (result.StatusCode == 400)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
             return Ok(result);
         }
@@ -58,7 +61,7 @@ namespace GymMangamentSystem.Apis.Controllers
             var result = await _accountService.ForgetPassword(email);
             if (result.StatusCode == 400)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
             return Ok(result);
         }
@@ -90,7 +93,7 @@ namespace GymMangamentSystem.Apis.Controllers
             var result = await _accountService.ResetPasswordAsync(dto);
             if (result.StatusCode == 400)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
             return Ok(result);
         }
@@ -119,7 +122,7 @@ namespace GymMangamentSystem.Apis.Controllers
 
             if (result.StatusCode == 200)
             {
-                return Ok(result.Message);
+                return Ok(result);
             }
 
             return StatusCode(result.Data != null ? result.StatusCode.Value : 500, result.Message);
@@ -135,7 +138,7 @@ namespace GymMangamentSystem.Apis.Controllers
             var result = await _accountService.ResendConfirmationEmailAsync(email, GenerateCallBackUrl);
             if (result.StatusCode == 400)
             {
-                return BadRequest(result.Message);
+                return BadRequest(result);
             }
             return Ok(result);
         }
