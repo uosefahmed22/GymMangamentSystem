@@ -102,7 +102,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 Token = await _TokenService.CreateTokenAsync(user)
             });
         }
-
         public async Task<ApiResponse> ForgetPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -163,7 +162,13 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
 
             if (user == null)
             {
-                return new ApiResponse(400, "User not found.");
+                return new ApiResponse(404, "User not found.");
+            }
+
+            var isOldPasswordValid = await _userManager.CheckPasswordAsync(user, oldPassword);
+            if (!isOldPasswordValid)
+            {
+                return new ApiResponse(400, "The old password is incorrect.");
             }
 
             var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
@@ -174,9 +179,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 return new ApiResponse(200, "Password changed successfully.");
             }
 
-            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return new ApiResponse(400, $"Failed to change password. Errors: {errors}");
+            return new ApiResponse(400, "Failed to change password.");
         }
+
         public async Task<ApiResponse> ResendConfirmationEmailAsync(string email, Func<string, string, string> generateCallBackUrl)
         {
             var user = await _userManager.FindByEmailAsync(email);
