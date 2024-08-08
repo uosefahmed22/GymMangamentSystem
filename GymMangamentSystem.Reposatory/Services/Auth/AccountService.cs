@@ -80,6 +80,7 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
         public async Task<ApiResponse> LoginAsync(Login dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
+
             if (user == null)
             {
                 return new ApiResponse(400, "User not found.");
@@ -94,15 +95,14 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             {
                 return new ApiResponse(400, "Email not confirmed. Please check your email inbox to verify your email address.");
             }
-            var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault();
 
-            return new UserDto
+            return new ApiResponse(200, "Login successful", new UserDto
             {
                 Role = (UserRoleEnum)user.UserRole,
                 Token = await _TokenService.CreateTokenAsync(user)
-            };
+            });
         }
+
         public async Task<ApiResponse> ForgetPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
