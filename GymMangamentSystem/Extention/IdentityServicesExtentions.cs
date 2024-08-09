@@ -1,5 +1,6 @@
 ﻿using GymMangamentSystem.Apis.Helpers;
 using GymMangamentSystem.Core.IServices.Auth;
+using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Core.Models.Identity;
 using GymMangamentSystem.Reposatory.Data.Context;
 using GymMangamentSystem.Reposatory.Services.Auth;

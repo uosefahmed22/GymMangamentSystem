@@ -2,6 +2,7 @@
 using GymMangamentSystem.Core.Enums.Auth;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Auth;
+using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Core.Models.Identity;
 using MailKit.Security;
 using Microsoft.AspNetCore.Identity;

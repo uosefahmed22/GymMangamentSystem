@@ -1,5 +1,5 @@
 ﻿using GymMangamentSystem.Core.IServices.Auth;
-using GymMangamentSystem.Core.Models.Identity;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

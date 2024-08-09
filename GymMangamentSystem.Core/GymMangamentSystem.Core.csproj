@@ -22,7 +22,6 @@
     <Folder Include="Dtos\Business\" />
     <Folder Include="Enums\Business\" />
     <Folder Include="IServices\Business\" />
-    <Folder Include="Models\Business\" />
   </ItemGroup>
 
 </Project>
