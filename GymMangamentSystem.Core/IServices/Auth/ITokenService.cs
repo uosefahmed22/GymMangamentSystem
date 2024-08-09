@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Identity;
+﻿using GymMangamentSystem.Core.Models.Business;
 using System;
 using System.Collections.Generic;
 using System.Linq;
