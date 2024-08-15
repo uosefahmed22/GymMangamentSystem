@@ -47,7 +47,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
             try
             {
-                _context.Classes.Remove(ExsistingClass);
+                ExsistingClass.IsDeleted = true;
                 _context.Update(ExsistingClass);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Class deleted successfully");
@@ -62,6 +62,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             try
             {
                 var Class = await _context.Classes.FindAsync(id);
+                if (Class.IsDeleted == true)
+                {
+                    return null;
+                }
                 if (Class == null)
                 {
                     throw null;
@@ -78,10 +82,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         {
             try
             {
-                var Classes = await _context.Classes
-                    .Include(a => a.Trainer)
-                    .Include(a => a.Attendances)
-                    .Include(a => a.Memberships)
+                var Classes = await _context.Classes.Where(x => x.IsDeleted == false)
                     .ToListAsync();
                 var ClassesDto = _mapper.Map<IEnumerable<ClassDto>>(Classes);
                 return ClassesDto;
