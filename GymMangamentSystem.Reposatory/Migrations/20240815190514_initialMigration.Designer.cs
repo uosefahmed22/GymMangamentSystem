@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymMangamentSystem.Reposatory.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240809141208_initialMigration")]
+    [Migration("20240815190514_initialMigration")]
     partial class initialMigration
     {
         /// <inheritdoc />
@@ -24,6 +24,21 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AppUserNutritionPlan", b =>
+                {
+                    b.Property<int>("NutritionPlansNutritionPlanId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("NutritionPlansNutritionPlanId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("AppUserNutritionPlan");
+                });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUser", b =>
                 {
@@ -37,18 +52,21 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DietRecommendationId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -64,9 +82,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int?>("NutritionPlanId")
-                        .HasColumnType("int");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -95,7 +110,8 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DietRecommendationId");
+                    b.HasIndex("DisplayName")
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -105,27 +121,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("NutritionPlanId");
-
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUserWorkoutPlan", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("WorkoutPlanId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "WorkoutPlanId");
-
-                    b.HasIndex("WorkoutPlanId");
-
-                    b.ToTable("AppUserWorkoutPlan");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Attendance", b =>
@@ -141,6 +137,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -174,6 +173,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
@@ -186,50 +192,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.HasIndex("TrainerId");
 
                     b.ToTable("Classes");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.DietRecommendation", b =>
-                {
-                    b.Property<int>("DietRecommendationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DietRecommendationId"));
-
-                    b.Property<string>("Recommendation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DietRecommendationId");
-
-                    b.ToTable("DietRecommendations");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Enrollment", b =>
-                {
-                    b.Property<int>("EnrollmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollmentId"));
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EnrollmentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("EnrollmentId");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Enrollments");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Exercise", b =>
@@ -251,9 +213,27 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Repetitions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WorkoutPlanId")
+                        .HasColumnType("int");
+
                     b.HasKey("ExerciseId");
 
                     b.HasIndex("ExerciseCategoryId");
+
+                    b.HasIndex("WorkoutPlanId");
 
                     b.ToTable("Exercises");
                 });
@@ -270,6 +250,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("ExerciseCategoryId");
 
                     b.ToTable("ExerciseCategories");
@@ -284,8 +271,10 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeedbackId"));
 
                     b.Property<string>("Comments")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
@@ -308,6 +297,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HealthMetricId"));
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("MeasurementDate")
                         .HasColumnType("datetime2");
@@ -342,18 +334,54 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MealName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NutritionPlanId")
+                    b.Property<int>("MealsCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NutritionPlanId")
                         .HasColumnType("int");
 
                     b.HasKey("MealId");
 
+                    b.HasIndex("MealsCategoryId");
+
                     b.HasIndex("NutritionPlanId");
 
                     b.ToTable("Meals");
+                });
+
+            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.MealsCategory", b =>
+                {
+                    b.Property<int>("MealsCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MealsCategoryId"));
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("MealsCategoryId");
+
+                    b.ToTable("MealsCategory");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Membership", b =>
@@ -364,8 +392,18 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MembershipId"));
 
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("MembershipType")
                         .IsRequired()
@@ -383,6 +421,8 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.HasKey("MembershipId");
 
+                    b.HasIndex("ClassId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Memberships");
@@ -398,6 +438,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -425,6 +468,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PlanName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -445,6 +495,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("MembershipId")
                         .HasColumnType("int");
 
@@ -458,57 +511,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.TrainingImage", b =>
-                {
-                    b.Property<int>("TrainingImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingImageId"));
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TrainingImageId");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.ToTable("TrainingImages");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutExercise", b =>
-                {
-                    b.Property<int>("WorkoutExerciseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkoutExerciseId"));
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Repetitions")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Sets")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WorkoutPlanId")
-                        .HasColumnType("int");
-
-                    b.HasKey("WorkoutExerciseId");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("WorkoutPlanId");
-
-                    b.ToTable("WorkoutExercises");
-                });
-
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutPlan", b =>
                 {
                     b.Property<int>("WorkoutPlanId")
@@ -520,6 +522,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PlanName")
                         .IsRequired()
@@ -695,40 +704,19 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUser", b =>
+            modelBuilder.Entity("AppUserNutritionPlan", b =>
                 {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.DietRecommendation", "DietRecommendation")
-                        .WithMany("Users")
-                        .HasForeignKey("DietRecommendationId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", "NutritionPlan")
-                        .WithMany("Users")
-                        .HasForeignKey("NutritionPlanId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("DietRecommendation");
-
-                    b.Navigation("NutritionPlan");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUserWorkoutPlan", b =>
-                {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
-                        .WithMany("WorkoutPlans")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", null)
+                        .WithMany()
+                        .HasForeignKey("NutritionPlansNutritionPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.WorkoutPlan", "WorkoutPlan")
-                        .WithMany("MemberWorkoutPlans")
-                        .HasForeignKey("WorkoutPlanId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("WorkoutPlan");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Attendance", b =>
@@ -736,13 +724,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.HasOne("GymMangamentSystem.Core.Models.Business.Class", "Class")
                         .WithMany("Attendances")
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
                         .WithMany("Attendances")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Class");
@@ -755,29 +743,10 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "Trainer")
                         .WithMany()
                         .HasForeignKey("TrainerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Trainer");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Enrollment", b =>
-                {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.Class", "Class")
-                        .WithMany("Enrollments")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
-                        .WithMany("Enrollments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Class");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Exercise", b =>
@@ -788,7 +757,14 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.WorkoutPlan", "WorkoutPlan")
+                        .WithMany("Exercises")
+                        .HasForeignKey("WorkoutPlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ExerciseCategory");
+
+                    b.Navigation("WorkoutPlan");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Feedback", b =>
@@ -815,22 +791,37 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Meal", b =>
                 {
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.MealsCategory", "MealsCategory")
+                        .WithMany("Meals")
+                        .HasForeignKey("MealsCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", "NutritionPlan")
                         .WithMany("Meals")
                         .HasForeignKey("NutritionPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("MealsCategory");
 
                     b.Navigation("NutritionPlan");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Membership", b =>
                 {
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.Class", "Class")
+                        .WithMany("Memberships")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
                         .WithMany("Memberships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Class");
 
                     b.Navigation("User");
                 });
@@ -839,7 +830,8 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
                         .WithMany("Notifications")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
@@ -855,42 +847,12 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Navigation("Membership");
                 });
 
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.TrainingImage", b =>
-                {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.Exercise", "Exercise")
-                        .WithMany("TrainingImages")
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exercise");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutExercise", b =>
-                {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.Exercise", "Exercise")
-                        .WithMany("WorkoutExercises")
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.WorkoutPlan", "WorkoutPlan")
-                        .WithMany("WorkoutExercises")
-                        .HasForeignKey("WorkoutPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exercise");
-
-                    b.Navigation("WorkoutPlan");
-                });
-
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutPlan", b =>
                 {
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "Trainer")
-                        .WithMany()
+                        .WithMany("WorkoutPlans")
                         .HasForeignKey("TrainerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Trainer");
@@ -951,8 +913,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     b.Navigation("Attendances");
 
-                    b.Navigation("Enrollments");
-
                     b.Navigation("Feedbacks");
 
                     b.Navigation("HealthMetrics");
@@ -968,24 +928,17 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     b.Navigation("Attendances");
 
-                    b.Navigation("Enrollments");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.DietRecommendation", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Exercise", b =>
-                {
-                    b.Navigation("TrainingImages");
-
-                    b.Navigation("WorkoutExercises");
+                    b.Navigation("Memberships");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.ExerciseCategory", b =>
                 {
                     b.Navigation("Exercises");
+                });
+
+            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.MealsCategory", b =>
+                {
+                    b.Navigation("Meals");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Membership", b =>
@@ -996,15 +949,11 @@ namespace GymMangamentSystem.Reposatory.Migrations
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.NutritionPlan", b =>
                 {
                     b.Navigation("Meals");
-
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutPlan", b =>
                 {
-                    b.Navigation("MemberWorkoutPlans");
-
-                    b.Navigation("WorkoutExercises");
+                    b.Navigation("Exercises");
                 });
 #pragma warning restore 612, 618
         }

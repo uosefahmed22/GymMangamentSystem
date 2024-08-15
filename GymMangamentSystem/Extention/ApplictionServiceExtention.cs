@@ -1,6 +1,8 @@
 ﻿using GymMangamentSystem.Apis.Helpers;
 using GymMangamentSystem.Core.Errors;
+using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Reposatory.Data.Context;
+using GymMangamentSystem.Reposatory.Services.Business;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +34,8 @@ namespace GymMangamentSystem.Apis.Extention
 
 
             service.AddAutoMapper(typeof(MappingProfile));
+            service.AddScoped<IClassRepo, ClassRepo>();
+            service.AddScoped<IAttendaceRepo, AttendaceRepo>();
 
             return service;
         }

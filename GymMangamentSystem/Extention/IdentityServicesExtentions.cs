@@ -3,6 +3,7 @@ using GymMangamentSystem.Core.IServices.Auth;
 using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Core.Models.Identity;
 using GymMangamentSystem.Reposatory.Data.Context;
+using GymMangamentSystem.Reposatory.Services;
 using GymMangamentSystem.Reposatory.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -67,11 +68,14 @@ namespace GymMangamentSystem.Apis.Extention
                 };
             });
             services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+            services.AddSingleton<SoftDeleteInterceptor>();
 
-            services.AddDbContext<AppDBContext>(options =>
-            {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnections"));
-            });
+            // Add DbContext with respect to the SoftDeleteInterceptor
+            services.AddDbContext<AppDBContext>(
+                (serviceProvider, options) => options
+                .UseSqlServer(configuration.GetConnectionString("DefaultConnections"))
+                .AddInterceptors(serviceProvider.GetRequiredService<SoftDeleteInterceptor>()));
+
 
             services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySetting"));
             

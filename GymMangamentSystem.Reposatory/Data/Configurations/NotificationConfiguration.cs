@@ -16,7 +16,11 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
             builder.HasKey(n => n.NotificationId);
             builder.HasOne(n => n.User)
                    .WithMany(u => u.Notifications)
-                   .HasForeignKey(n => n.UserId);
+                   .HasForeignKey(n => n.UserId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
+
 }

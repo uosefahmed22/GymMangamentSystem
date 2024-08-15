@@ -16,9 +16,15 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
             builder.HasKey(p => p.PaymentId);
             builder.HasOne(p => p.Membership)
                    .WithMany(m => m.Payments)
-                   .HasForeignKey(p => p.MembershipId);
-            builder.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+                   .HasForeignKey(p => p.MembershipId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Property(p => p.Amount)
+                   .HasColumnType("decimal(18,2)");
+
+            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
+
+
 }
