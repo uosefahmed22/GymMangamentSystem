@@ -71,8 +71,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             try
             {
                 var attendances = await _context.Attendances
-                    .ToListAsync();
-                return _mapper.Map<IEnumerable<AttendanceDto>>(attendances);
+                    .Where(x => x.IsDeleted == false).ToListAsync();
+
+                var result = _mapper.Map<IEnumerable<AttendanceDto>>(attendances);
+
+                return result;
             }
             catch (Exception ex)
             {
