@@ -9,17 +9,19 @@ using System.Threading.Tasks;
 
 namespace GymMangamentSystem.Reposatory.Data.Configurations
 {
-    public class FeedbackConfiguration : IEntityTypeConfiguration<Feedback>
+
+    public class MealsCategoryConfiguration : IEntityTypeConfiguration<MealsCategory>
     {
-        public void Configure(EntityTypeBuilder<Feedback> builder)
+        public void Configure(EntityTypeBuilder<MealsCategory> builder)
         {
-            builder.HasKey(f => f.FeedbackId);
-            builder.HasOne(f => f.User)
-                   .WithMany(u => u.Feedbacks)
-                   .HasForeignKey(f => f.UserId)
+            builder.HasKey(mc => mc.MealsCategoryId);
+            builder.HasMany(mc => mc.Meals)
+                   .WithOne(m => m.MealsCategory)
+                   .HasForeignKey(m => m.MealsCategoryId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
+
 }

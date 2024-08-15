@@ -13,11 +13,16 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<HealthMetric> builder)
         {
-            builder.HasKey(h => h.HealthMetricId);
-            builder.HasOne(h => h.User)
+            builder.HasKey(hm => hm.HealthMetricId);
+            builder.HasOne(hm => hm.User)
                    .WithMany(u => u.HealthMetrics)
-                   .HasForeignKey(h => h.UserId);
-            builder.Property(x => x.Value).HasColumnType("decimal(18,2)");
+                   .HasForeignKey(hm => hm.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(hm => hm.Value)
+                   .HasColumnType("decimal(18,2)");
+
+            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
 }

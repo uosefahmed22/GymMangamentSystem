@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Business;
 
 namespace GymMangamentSystem.Apis.Helpers
 {
@@ -7,7 +9,8 @@ namespace GymMangamentSystem.Apis.Helpers
         public MappingProfile()
         {
 
-
+            CreateMap<Attendance,AttendanceDto>().ReverseMap();
+            CreateMap<Class,ClassDto>().ReverseMap();
         }
     }
 }

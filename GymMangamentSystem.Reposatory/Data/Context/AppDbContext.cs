@@ -36,8 +36,6 @@ namespace GymMangamentSystem.Reposatory.Data.Context
 
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Class> Classes { get; set; }
-        public DbSet<DietRecommendation> DietRecommendations { get; set; }
-        public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseCategory> ExerciseCategories { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
@@ -47,8 +45,6 @@ namespace GymMangamentSystem.Reposatory.Data.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NutritionPlan> NutritionPlans { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<TrainingImage> TrainingImages { get; set; }
-        public DbSet<WorkoutExercise> WorkoutExercises { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
     }
 }

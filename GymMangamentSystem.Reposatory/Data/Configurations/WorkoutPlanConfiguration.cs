@@ -13,11 +13,20 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkoutPlan> builder)
         {
-            builder.HasKey(w => w.WorkoutPlanId);
-            builder.HasOne(w => w.Trainer)
-                   .WithMany()
-                   .HasForeignKey(w => w.TrainerId);
+            builder.HasKey(wp => wp.WorkoutPlanId);
+            builder.HasOne(wp => wp.Trainer)
+                   .WithMany(u => u.WorkoutPlans)
+                   .HasForeignKey(wp => wp.TrainerId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(wp => wp.Exercises)
+                   .WithOne(e => e.WorkoutPlan)
+                   .HasForeignKey(e => e.WorkoutPlanId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
+
 
 }

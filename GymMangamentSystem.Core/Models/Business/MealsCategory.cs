@@ -8,17 +8,14 @@ using System.Threading.Tasks;
 
 namespace GymMangamentSystem.Core.Models.Business
 {
-    public class WorkoutPlan
+    public class MealsCategory
     {
-        public int WorkoutPlanId { get; set; }
+        public int MealsCategoryId { get; set; }
         public string? ImageUrl { get; set; }
         [NotMapped]
         public IFormFile Image { get; set; }
-        public string PlanName { get; set; }
-        public string Description { get; set; }
+        public string CategoryName { get; set; }
         public bool IsDeleted { get; set; }
-        public string TrainerId { get; set; }
-        public AppUser Trainer { get; set; }
-        public ICollection<Exercise> Exercises { get; set; }
+        public ICollection<Meal> Meals { get; set; }
     }
 }

@@ -14,6 +14,12 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
         public void Configure(EntityTypeBuilder<ExerciseCategory> builder)
         {
             builder.HasKey(ec => ec.ExerciseCategoryId);
+            builder.HasMany(ec => ec.Exercises)
+                   .WithOne(e => e.ExerciseCategory)
+                   .HasForeignKey(e => e.ExerciseCategoryId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
 }

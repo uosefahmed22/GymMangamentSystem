@@ -9,16 +9,18 @@ using System.Threading.Tasks;
 
 namespace GymMangamentSystem.Reposatory.Data.Configurations
 {
+
     public class ClassConfiguration : IEntityTypeConfiguration<Class>
     {
         public void Configure(EntityTypeBuilder<Class> builder)
         {
             builder.HasKey(c => c.ClassId);
+            builder.HasMany(c => c.Memberships)
+                   .WithOne(m => m.Class)
+                   .HasForeignKey(m => m.ClassId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(c => c.Trainer)
-                   .WithMany()
-                   .HasForeignKey(c => c.TrainerId)
-                   .OnDelete(DeleteBehavior.NoAction);
+            builder.HasQueryFilter(c => !c.IsDeleted);
         }
     }
 }
