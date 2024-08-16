@@ -24,9 +24,7 @@ namespace GymMangamentSystem
             {
                 options.AddPolicy("MyPolicy", policy =>
                 {
-                    policy.AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowAnyOrigin();
+                    policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
                 });
             });
 

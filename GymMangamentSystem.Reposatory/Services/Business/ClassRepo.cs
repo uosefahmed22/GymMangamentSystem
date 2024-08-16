@@ -41,7 +41,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         public async Task<ApiResponse> DeleteClass(int id)
         {
             var ExsistingClass = await _context.Classes.FindAsync(id);
-            if (ExsistingClass == null)
+            if (ExsistingClass == null || ExsistingClass.IsDeleted==true)
             {
                 return new ApiResponse(404, "Class not found");
             }
@@ -62,14 +62,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             try
             {
                 var Class = await _context.Classes.FindAsync(id);
-                if (Class.IsDeleted == true)
+                if (Class == null || Class.IsDeleted == true)
                 {
                     return null;
                 }
-                if (Class == null)
-                {
-                    throw null;
-                }
+
                 var ClassDto = _mapper.Map<ClassDto>(Class);
                 return ClassDto;
             }
@@ -97,7 +94,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             try
             {
                 var existingClass = await _context.Classes.FindAsync(id);
-                if (existingClass == null)
+                if (existingClass == null || existingClass.IsDeleted == true)
                 {
                     return new ApiResponse(404, "Class not found");
                 }

@@ -47,13 +47,13 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         public async Task<ApiResponse> DeleteAttendance(int id)
         {
             var ExsistingAttendance = await _context.Attendances.FindAsync(id);
-            if (ExsistingAttendance == null)
+            
+            if (ExsistingAttendance == null || ExsistingAttendance.IsDeleted == true)
             {
                 return new ApiResponse(404, "Attendance not found");
             }
             try
             {
-                //softdelete
                 ExsistingAttendance.IsDeleted = true;
 
                 _context.Entry(ExsistingAttendance).State = EntityState.Modified;

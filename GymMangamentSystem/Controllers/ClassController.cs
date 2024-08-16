@@ -20,7 +20,7 @@ namespace GymMangamentSystem.Apis.Controllers
             _classRepo = classRepo;
         }
 
-        [HttpGet("GetClass")]
+        [HttpGet("getClass")]
         public async Task<IActionResult> GetClass(int id)
         {
             try
@@ -42,7 +42,7 @@ namespace GymMangamentSystem.Apis.Controllers
             }
         }
 
-        [HttpGet("GetAllClasses")]
+        [HttpGet("getAllClasses")]
         public async Task<IActionResult> GetAllClasses()
         {
             try

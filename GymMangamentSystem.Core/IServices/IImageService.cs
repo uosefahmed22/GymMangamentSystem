@@ -9,7 +9,6 @@ namespace GymMangamentSystem.Core.IServices
 {
     public interface IImageService
     {
-        Task<Tuple<int, string>> SaveImageAsync(IFormFile imageFile);
         Task DeleteImageAsync(string imageFileName);
         Task<Tuple<int, string>> UploadImageAsync(IFormFile imageFile);
     }

@@ -19,9 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\Business\" />
     <Folder Include="Enums\Business\" />
-    <Folder Include="IServices\Business\" />
   </ItemGroup>
 
 </Project>
