@@ -108,7 +108,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         public async Task<ApiResponse> UpdateWorkoutPlan(int id, WorkoutPlanDto workoutPlanDto)
         {
             var existingWorkoutPlan = await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.WorkoutPlanId == id);
-            if (existingWorkoutPlan == null || existingWorkoutPlan.IsDeleted)
+            if (existingWorkoutPlan == null || existingWorkoutPlan.IsDeleted == true)
             {
                 return new ApiResponse(400, "Workout Plan does not exist or is already deleted");
             }
