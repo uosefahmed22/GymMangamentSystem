@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -69,19 +70,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (exerciseCategory.Image != null)
-            {
-                var fileResult = await _imageService.UploadImageAsync(exerciseCategory.Image);
-                if (fileResult.Item1 == 1)
-                {
-                    exerciseCategory.ImageUrl = fileResult.Item2;
-                }
-                else
-                {
-                    return BadRequest(new ApiResponse(400, fileResult.Item2));
-                }
-            }
-
+           
             var response = await _exerciseCategory.AddExerciseCategory(exerciseCategory);
             if (response.StatusCode == 200)
             {
@@ -111,44 +100,12 @@ namespace GymMangamentSystem.Apis.Controllers
             {
                 return BadRequest(new ApiResponse(400, "Invalid data provided"));
             }
-
-            var existingExerciseCategory = await _context.ExerciseCategories.FindAsync(id);
-            if (existingExerciseCategory == null || existingExerciseCategory.IsDeleted)
+            var result = await _exerciseCategory.UpdateExerciseCategory(id, exerciseCategory);
+            if (result.StatusCode == 200)
             {
-                return NotFound(new ApiResponse(404, "Exercise Category not found"));
+                return Ok(result);
             }
-
-            if (exerciseCategory.Image != null)
-            {
-                // Delete old image if it exists
-                if (!string.IsNullOrEmpty(existingExerciseCategory.ImageUrl))
-                {
-                    await _imageService.DeleteImageAsync(existingExerciseCategory.ImageUrl);
-                }
-
-                // Upload new image
-                var fileResult = await _imageService.UploadImageAsync(exerciseCategory.Image);
-                if (fileResult.Item1 == 1)
-                {
-                    existingExerciseCategory.ImageUrl = fileResult.Item2;
-                }
-                else
-                {
-                    return BadRequest(new ApiResponse(400, fileResult.Item2));
-                }
-            }
-
-            // Update other properties
-            existingExerciseCategory.CategoryName = exerciseCategory.CategoryName ?? existingExerciseCategory.CategoryName;
-
-            _context.ExerciseCategories.Update(existingExerciseCategory);
-            await _context.SaveChangesAsync();
-
-            return Ok(new ApiResponse(200, "Exercise Category updated successfully."));
+            return BadRequest(result);
         }
-
-
-
-
     }
 }
