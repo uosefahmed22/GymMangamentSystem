@@ -11,7 +11,7 @@ namespace GymMangamentSystem.Core.Dtos.Business
 {
     public class ClassDto
     {
-        public int ClassId { get; set; }
+        public int? ClassId { get; set; }
         public string? ImageUrl { get; set; }
         //[NotMapped]
         //public IFormFile? Image { get; set; }

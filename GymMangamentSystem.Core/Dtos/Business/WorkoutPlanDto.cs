@@ -17,7 +17,6 @@ namespace GymMangamentSystem.Core.Dtos.Business
         public IFormFile Image { get; set; }
         public string PlanName { get; set; }
         public string Description { get; set; }
-        public bool? IsDeleted { get; set; }
         public string? TrainerId { get; set; }
     }
 }

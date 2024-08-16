@@ -13,6 +13,7 @@ namespace GymMangamentSystem.Apis.Helpers
             CreateMap<Class,ClassDto>().ReverseMap();
             CreateMap<ExerciseCategory,ExerciseCategoryDto>().ReverseMap();
             CreateMap<WorkoutPlan,WorkoutPlanDto>().ReverseMap();
+            CreateMap<Exercise,ExerciseDto>().ReverseMap();
         }
     }
 }
