@@ -80,7 +80,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
 
         }
-        public async Task<List<ExerciseCategoryDto>> GetExerciseCategories()
+        public async Task<IEnumerable<ExerciseCategoryDto>> GetExerciseCategories()
         {
             try
             {

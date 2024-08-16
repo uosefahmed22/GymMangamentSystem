@@ -18,12 +18,10 @@ namespace GymMangamentSystem.Apis.Controllers
     public class ExerciseCategoryController : ControllerBase
     {
         private readonly IExerciseCategoryRepo _exerciseCategory;
-        private readonly IImageService _imageService;
 
-        public ExerciseCategoryController(IExerciseCategoryRepo exerciseCategory, IImageService fileService)
+        public ExerciseCategoryController(IExerciseCategoryRepo exerciseCategory)
         {
             _exerciseCategory = exerciseCategory;
-            _imageService = fileService;
         }
         [HttpGet("getExerciseCategories")]
         public async Task<IActionResult> GetExerciseCategories()
