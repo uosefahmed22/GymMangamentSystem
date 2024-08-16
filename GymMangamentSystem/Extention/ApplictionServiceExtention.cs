@@ -1,5 +1,6 @@
 ﻿using GymMangamentSystem.Apis.Helpers;
 using GymMangamentSystem.Core.Errors;
+using GymMangamentSystem.Core.IServices;
 using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Reposatory.Data.Context;
 using GymMangamentSystem.Reposatory.Services.Business;
@@ -36,6 +37,9 @@ namespace GymMangamentSystem.Apis.Extention
             service.AddAutoMapper(typeof(MappingProfile));
             service.AddScoped<IClassRepo, ClassRepo>();
             service.AddScoped<IAttendaceRepo, AttendaceRepo>();
+            service.AddScoped<IExerciseCategoryRepo, ExerciseCategoryRepo>();
+            service.AddScoped<IImageService, ImageService>();
+
 
             return service;
         }

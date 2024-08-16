@@ -14,10 +14,6 @@ namespace GymMangamentSystem.Apis.Helpers
             _cloudinary = cloudinary ?? throw new ArgumentNullException(nameof(cloudinary));
         }
 
-        public async Task<Tuple<int, string>> SaveImageAsync(IFormFile imageFile)
-        {
-            return await UploadImageAsync(imageFile);
-        }
         public async Task<Tuple<int, string>> UploadImageAsync(IFormFile imageFile)
         {
             try
@@ -59,19 +55,25 @@ namespace GymMangamentSystem.Apis.Helpers
             try
             {
                 var publicId = GetPublicIdFromUrl(imageUrl);
-                var deletionParams = new DeletionParams(publicId);
-                await _cloudinary.DestroyAsync(deletionParams);
+                var deletionParams = new DeletionParams(publicId)
+                {
+                    Invalidate = true
+                };
+
+                var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
+
+                Console.WriteLine($"Deletion result: {deletionResult.Result}");
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Exception in DeleteImageAsync: {ex.Message}");
             }
         }
+
         private string GetPublicIdFromUrl(string url)
         {
-            var uri = new Uri(url);
-            var path = uri.AbsolutePath;
-            return path.Substring(path.LastIndexOf('/') + 1).Split('.')[0];
+            return Path.GetFileNameWithoutExtension(new Uri(url).AbsolutePath);
         }
-    }
 
+    }
 }
