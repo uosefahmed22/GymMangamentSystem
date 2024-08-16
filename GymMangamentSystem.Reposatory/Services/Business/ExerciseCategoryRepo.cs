@@ -28,16 +28,31 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> AddExerciseCategory(ExerciseCategoryDto exerciseCategoryDto)
         {
-            var exsist = _context.ExerciseCategories.Where(x => x.CategoryName == exerciseCategoryDto.CategoryName).FirstOrDefault();
-            if (exerciseCategoryDto == null || exsist != null)
+            var existingCategory = _context.ExerciseCategories.FirstOrDefault(x => x.CategoryName == exerciseCategoryDto.CategoryName);
+            if (exerciseCategoryDto == null || existingCategory != null)
             {
-                return new ApiResponse(400, "Exercise Category is null or already exsist");
+                return new ApiResponse(400, "Exercise Category is null or already exists");
             }
+
             try
             {
+                if (exerciseCategoryDto.Image != null)
+                {
+                    var fileResult = await _imageService.UploadImageAsync(exerciseCategoryDto.Image);
+                    if (fileResult.Item1 == 1)
+                    {
+                        exerciseCategoryDto.ImageUrl = fileResult.Item2;
+                    }
+                    else
+                    {
+                        return new ApiResponse(400, fileResult.Item2);
+                    }
+                }
+
                 var exerciseCategory = _mapper.Map<ExerciseCategory>(exerciseCategoryDto);
-                _context.Add(exerciseCategory);
+                _context.ExerciseCategories.Add(exerciseCategory);
                 await _context.SaveChangesAsync();
+
                 return new ApiResponse(200, "Exercise Category added successfully");
             }
             catch (Exception ex)
@@ -45,6 +60,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
+
         public async Task<ApiResponse> DeleteExerciseCategory(int id)
         {
             var exerciseCategory = _context.ExerciseCategories.Find(id);
@@ -97,26 +113,40 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> UpdateExerciseCategory(int id, ExerciseCategoryDto exerciseCategoryDto)
         {
-            try
+            var existingExerciseCategory = await _context.ExerciseCategories.FindAsync(id);
+            if (existingExerciseCategory == null || existingExerciseCategory.IsDeleted)
             {
-                var existingExerciseCategory = await _context.ExerciseCategories.FindAsync(id);
-                if (existingExerciseCategory == null || existingExerciseCategory.IsDeleted)
+                return new ApiResponse(404, "Exercise Category not found");
+            }
+
+            if (exerciseCategoryDto.Image != null)
+            {
+                if (!string.IsNullOrEmpty(existingExerciseCategory.ImageUrl))
                 {
-                    return new ApiResponse(404, "Exercise Category not found");
+                    await _imageService.DeleteImageAsync(existingExerciseCategory.ImageUrl);
                 }
 
-                existingExerciseCategory.CategoryName = exerciseCategoryDto.CategoryName ?? existingExerciseCategory.CategoryName;
-                existingExerciseCategory.ImageUrl = exerciseCategoryDto.ImageUrl ?? existingExerciseCategory.ImageUrl;
-
-                _context.ExerciseCategories.Update(existingExerciseCategory);
-                await _context.SaveChangesAsync();
-
-                return new ApiResponse(200, "Exercise Category updated successfully.");
+                var fileResult = await _imageService.UploadImageAsync(exerciseCategoryDto.Image);
+                if (fileResult.Item1 == 1)
+                {
+                    existingExerciseCategory.ImageUrl = fileResult.Item2;
+                }
+                else
+                {
+                    return new ApiResponse(400, fileResult.Item2);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return new ApiResponse(500, "Error: " + ex.Message);
+                exerciseCategoryDto.ImageUrl = existingExerciseCategory.ImageUrl;
             }
+
+            existingExerciseCategory.CategoryName = exerciseCategoryDto.CategoryName ?? existingExerciseCategory.CategoryName;
+            existingExerciseCategory.ImageUrl = exerciseCategoryDto.ImageUrl ?? existingExerciseCategory.ImageUrl;
+
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse(200, "Exercise Category updated successfully");
         }
     }
 }
