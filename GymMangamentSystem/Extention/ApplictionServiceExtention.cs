@@ -39,6 +39,7 @@ namespace GymMangamentSystem.Apis.Extention
             service.AddScoped<IAttendaceRepo, AttendaceRepo>();
             service.AddScoped<IExerciseCategoryRepo, ExerciseCategoryRepo>();
             service.AddScoped<IImageService, ImageService>();
+            service.AddScoped<IWorkoutPlanRepo, WorkoutPlanRepo>();
 
 
             return service;
