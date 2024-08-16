@@ -60,7 +60,6 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-
         public async Task<ApiResponse> DeleteExerciseCategory(int id)
         {
             var exerciseCategory = _context.ExerciseCategories.Find(id);
