@@ -6,6 +6,7 @@ using GymMangamentSystem.Core.IServices;
 using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Reposatory.Data.Context;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +19,11 @@ namespace GymMangamentSystem.Apis.Controllers
     {
         private readonly IExerciseCategoryRepo _exerciseCategory;
         private readonly IImageService _imageService;
-        private readonly IMapper _mapper;
-        private readonly AppDBContext _context;
 
-        public ExerciseCategoryController(IExerciseCategoryRepo exerciseCategory, IImageService fileService, IMapper mapper, AppDBContext context)
+        public ExerciseCategoryController(IExerciseCategoryRepo exerciseCategory, IImageService fileService)
         {
             _exerciseCategory = exerciseCategory;
             _imageService = fileService;
-            _mapper = mapper;
-            _context = context;
         }
         [HttpGet("getExerciseCategories")]
         public async Task<IActionResult> GetExerciseCategories()
@@ -62,6 +59,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(new ApiResponse(404, ex.Message));
             }
         }
+        [Authorize(Roles = "Admin, Trainer")]
         [HttpPost]
         public async Task<IActionResult> AddExerciseCategory([FromForm] ExerciseCategoryDto exerciseCategory)
         {
@@ -70,8 +68,8 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
 
-           
             var response = await _exerciseCategory.AddExerciseCategory(exerciseCategory);
+
             if (response.StatusCode == 200)
             {
                 return Ok(response);
@@ -79,6 +77,7 @@ namespace GymMangamentSystem.Apis.Controllers
 
             return BadRequest(response);
         }
+        [Authorize(Roles = "Admin, Trainer")]
         [HttpDelete]
         public async Task<IActionResult> DeleteExerciseCategory(int id)
         {
@@ -93,6 +92,7 @@ namespace GymMangamentSystem.Apis.Controllers
             }
             return BadRequest(response);
         }
+        [Authorize(Roles = "Admin, Trainer")]
         [HttpPut]
         public async Task<IActionResult> UpdateExerciseCategory(int id, [FromForm] ExerciseCategoryDto exerciseCategory)
         {
