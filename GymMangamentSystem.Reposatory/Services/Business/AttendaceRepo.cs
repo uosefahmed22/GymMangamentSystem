@@ -66,21 +66,26 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
 
         }
-        public async Task<IEnumerable<AttendanceDto>> GetAttendances()
+        public async Task<IEnumerable<object>> GetAttendancesForUser(string userId)
         {
             try
             {
                 var attendances = await _context.Attendances
-                    .Where(x => x.IsDeleted == false).ToListAsync();
+                    .Where(a => a.UserId == userId && !a.IsDeleted)
+                    .Select(a => new
+                    {
+                        a.IsAttended,
+                        a.AttendanceDate
+                    })
+                    .ToListAsync();
 
-                var result = _mapper.Map<IEnumerable<AttendanceDto>>(attendances);
-
-                return result;
+                return attendances;
             }
             catch (Exception ex)
             {
                 throw new Exception("Error: " + ex.Message);
             }
         }
+
     }
 }

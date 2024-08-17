@@ -21,7 +21,7 @@ namespace GymMangamentSystem.Core.Models.Business
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
         public ICollection<NutritionPlan> NutritionPlans { get; set; }
         public ICollection<Attendance> Attendances { get; set; }
-        public ICollection<HealthMetric> HealthMetrics { get; set; }
+        public ICollection<BMIRecord> BMIRecords { get; set; }
         public ICollection<Feedback> Feedbacks { get; set; }
         public ICollection<Notification> Notifications { get; set; }
         public ICollection<Membership> Memberships { get; set; }

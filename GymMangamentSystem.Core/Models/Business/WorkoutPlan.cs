@@ -17,8 +17,8 @@ namespace GymMangamentSystem.Core.Models.Business
         public string PlanName { get; set; }
         public string Description { get; set; }
         public bool IsDeleted { get; set; }
-        public string TrainerId { get; set; }
-        public AppUser Trainer { get; set; }
+        public string? TrainerId { get; set; }
+        public AppUser? Trainer { get; set; }
         public ICollection<Exercise> Exercises { get; set; }
     }
 }

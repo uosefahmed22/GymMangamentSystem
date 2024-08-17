@@ -17,7 +17,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
             builder.HasOne(wp => wp.Trainer)
                    .WithMany(u => u.WorkoutPlans)
                    .HasForeignKey(wp => wp.TrainerId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasMany(wp => wp.Exercises)
                    .WithOne(e => e.WorkoutPlan)

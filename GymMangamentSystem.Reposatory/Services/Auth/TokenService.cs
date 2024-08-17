@@ -31,7 +31,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.GivenName, user.DisplayName),
-                new Claim("TrainerId", user.Id.ToString())
+                new Claim("TrainerId", user.Id.ToString()),
+                new Claim("UserId", user.Id.ToString())
+
             };
 
             var roles = await _userManager.GetRolesAsync(user);

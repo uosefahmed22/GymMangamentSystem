@@ -21,16 +21,15 @@ namespace GymMangamentSystem.Apis.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAttendances()
         {
-            var response = await _attendaceRepo.GetAttendances();
-            try
-            {
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponse(404, ex.Message));
-            }
 
+            var response = await _attendaceRepo.GetAttendancesForUser(User.Identity.Name);
+            var UserIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (UserIdClaim == null)
+            {
+                return BadRequest("UserIdClaim claim not found in the token");
+            }
+            var result = await _attendaceRepo.GetAttendancesForUser(UserIdClaim.Value);
+            return Ok(result);
         }
 
         [Authorize(Roles = "Admin, Receptionist")]

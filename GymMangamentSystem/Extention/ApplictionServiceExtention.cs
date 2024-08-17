@@ -41,6 +41,8 @@ namespace GymMangamentSystem.Apis.Extention
             service.AddScoped<IImageService, ImageService>();
             service.AddScoped<IWorkoutPlanRepo, WorkoutPlanRepo>();
             service.AddScoped<IExerciseRepo, ExerciseRepo>();
+            service.AddScoped<IFeedbackRepo, FeedbackRepo>();
+            service.AddScoped<IBMIRecordRepo, BMIRecordRepo>();
 
 
             return service;

@@ -4,16 +4,19 @@ using GymMangamentSystem.Reposatory.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GymMangamentSystem.Reposatory.Migrations
+namespace GymMangamentSystem.Reposatory.Data.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240817132402_UpdateBMI")]
+    partial class UpdateBMI
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,6 +157,47 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.ToTable("Attendances");
                 });
 
+            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.BMIRecord", b =>
+                {
+                    b.Property<int>("BMIRecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BMIRecordId"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HeightInMeters")
+                        .HasPrecision(3, 2)
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("MeasurementDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("WeightInKg")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("BMIRecordId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BMIRecords", (string)null);
+                });
+
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Class", b =>
                 {
                     b.Property<int>("ClassId")
@@ -285,38 +329,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Feedbacks");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.HealthMetric", b =>
-                {
-                    b.Property<int>("HealthMetricId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HealthMetricId"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("MeasurementDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MetricType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("HealthMetricId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("HealthMetrics");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Meal", b =>
@@ -527,7 +539,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TrainerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("WorkoutPlanId");
@@ -730,6 +741,17 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.BMIRecord", b =>
+                {
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
+                        .WithMany("BMIRecords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Class", b =>
                 {
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "Trainer")
@@ -763,17 +785,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.HealthMetric", b =>
-                {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
-                        .WithMany("HealthMetrics")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -844,8 +855,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "Trainer")
                         .WithMany("WorkoutPlans")
                         .HasForeignKey("TrainerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Trainer");
                 });
@@ -905,9 +915,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     b.Navigation("Attendances");
 
-                    b.Navigation("Feedbacks");
+                    b.Navigation("BMIRecords");
 
-                    b.Navigation("HealthMetrics");
+                    b.Navigation("Feedbacks");
 
                     b.Navigation("Memberships");
 
