@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Dtos.Business;
 
 namespace GymMangamentSystem.Reposatory.Data.Context
 {
@@ -39,7 +40,7 @@ namespace GymMangamentSystem.Reposatory.Data.Context
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseCategory> ExerciseCategories { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<HealthMetric> HealthMetrics { get; set; }
+        public DbSet<BMIRecord> bMIRecords { get; set; }
         public DbSet<Meal> Meals { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Notification> Notifications { get; set; }

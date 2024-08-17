@@ -28,7 +28,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             try
             {
                 var AtteendanceEntity = _mapper.Map<Class>(classDto);
-                _context.Add(AtteendanceEntity);
+                await _context.AddAsync(AtteendanceEntity);
                 await _context.SaveChangesAsync();
 
                 return new ApiResponse(200, "Class added successfully");

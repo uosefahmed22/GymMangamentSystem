@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace GymMangamentSystem.Reposatory.Migrations
+namespace GymMangamentSystem.Reposatory.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class initialMigration : Migration
+    public partial class UpdateBMI : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,7 +63,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     ExerciseCategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -78,7 +78,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     MealsCategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -93,7 +93,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     NutritionPlanId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
@@ -210,12 +210,36 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BMIRecords",
+                columns: table => new
+                {
+                    BMIRecordId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MeasurementDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WeightInKg = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    HeightInMeters = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BMIRecords", x => x.BMIRecordId);
+                    table.ForeignKey(
+                        name: "FK_BMIRecords_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Classes",
                 columns: table => new
                 {
                     ClassId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClassName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -257,29 +281,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HealthMetrics",
-                columns: table => new
-                {
-                    HealthMetricId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MetricType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    MeasurementDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HealthMetrics", x => x.HealthMetricId);
-                    table.ForeignKey(
-                        name: "FK_HealthMetrics_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
@@ -307,11 +308,11 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     WorkoutPlanId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    TrainerId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    TrainerId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -321,7 +322,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         column: x => x.TrainerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -354,7 +355,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     MealId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MealName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -384,6 +385,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     AttendanceId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IsAttended = table.Column<bool>(type: "bit", nullable: false),
                     AttendanceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -412,7 +414,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 {
                     MembershipId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MembershipType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -446,7 +448,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ExerciseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Repetitions = table.Column<int>(type: "int", nullable: false),
                     Sets = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -564,6 +566,11 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BMIRecords_UserId",
+                table: "BMIRecords",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Classes_TrainerId",
                 table: "Classes",
                 column: "TrainerId");
@@ -581,11 +588,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_UserId",
                 table: "Feedbacks",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_HealthMetrics_UserId",
-                table: "HealthMetrics",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -649,13 +651,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 name: "Attendances");
 
             migrationBuilder.DropTable(
+                name: "BMIRecords");
+
+            migrationBuilder.DropTable(
                 name: "Exercises");
 
             migrationBuilder.DropTable(
                 name: "Feedbacks");
-
-            migrationBuilder.DropTable(
-                name: "HealthMetrics");
 
             migrationBuilder.DropTable(
                 name: "Meals");

@@ -29,7 +29,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(u => u.HealthMetrics)
+            builder.HasMany(u => u.BMIRecords)
                 .WithOne(hm => hm.User)
                 .HasForeignKey(hm => hm.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
