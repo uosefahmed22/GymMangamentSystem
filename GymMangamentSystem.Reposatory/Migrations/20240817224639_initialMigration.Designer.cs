@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GymMangamentSystem.Reposatory.Data.Migrations
+namespace GymMangamentSystem.Reposatory.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240817132402_UpdateBMI")]
-    partial class UpdateBMI
+    [Migration("20240817224639_initialMigration")]
+    partial class initialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,21 +24,6 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("AppUserNutritionPlan", b =>
-                {
-                    b.Property<int>("NutritionPlansNutritionPlanId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("NutritionPlansNutritionPlanId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("AppUserNutritionPlan");
-                });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUser", b =>
                 {
@@ -83,6 +68,9 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int?>("NutritionPlanId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -120,6 +108,8 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("NutritionPlanId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -170,8 +160,8 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("HeightInMeters")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -388,7 +378,7 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
 
                     b.HasKey("MealsCategoryId");
 
-                    b.ToTable("MealsCategory");
+                    b.ToTable("MealsCategories");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Membership", b =>
@@ -707,19 +697,14 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("AppUserNutritionPlan", b =>
+            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUser", b =>
                 {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", null)
-                        .WithMany()
-                        .HasForeignKey("NutritionPlansNutritionPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", "nutritionPlan")
+                        .WithMany("Users")
+                        .HasForeignKey("NutritionPlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("nutritionPlan");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Attendance", b =>
@@ -803,7 +788,7 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                     b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", "NutritionPlan")
                         .WithMany("Meals")
                         .HasForeignKey("NutritionPlanId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("MealsCategory");
 
@@ -951,6 +936,8 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.NutritionPlan", b =>
                 {
                     b.Navigation("Meals");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutPlan", b =>

@@ -39,6 +39,7 @@ namespace GymMangamentSystem.Reposatory.Data.Context
         public DbSet<Class> Classes { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<ExerciseCategory> ExerciseCategories { get; set; }
+        public DbSet<MealsCategory> MealsCategories { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<BMIRecord> bMIRecords { get; set; }
         public DbSet<Meal> Meals { get; set; }

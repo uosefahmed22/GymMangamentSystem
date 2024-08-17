@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace GymMangamentSystem.Reposatory.Data.Migrations
+namespace GymMangamentSystem.Reposatory.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateBMI : Migration
+    public partial class initialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,36 +28,6 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DisplayName = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserRole = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ProfileImageName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ExerciseCategories",
                 columns: table => new
                 {
@@ -73,7 +43,7 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MealsCategory",
+                name: "MealsCategories",
                 columns: table => new
                 {
                     MealsCategoryId = table.Column<int>(type: "int", nullable: false)
@@ -84,7 +54,7 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MealsCategory", x => x.MealsCategoryId);
+                    table.PrimaryKey("PK_MealsCategories", x => x.MealsCategoryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -121,6 +91,73 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserRole = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ProfileImageName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NutritionPlanId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_NutritionPlans_NutritionPlanId",
+                        column: x => x.NutritionPlanId,
+                        principalTable: "NutritionPlans",
+                        principalColumn: "NutritionPlanId",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Meals",
+                columns: table => new
+                {
+                    MealId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MealName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    NutritionPlanId = table.Column<int>(type: "int", nullable: true),
+                    MealsCategoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Meals", x => x.MealId);
+                    table.ForeignKey(
+                        name: "FK_Meals_MealsCategories_MealsCategoryId",
+                        column: x => x.MealsCategoryId,
+                        principalTable: "MealsCategories",
+                        principalColumn: "MealsCategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Meals_NutritionPlans_NutritionPlanId",
+                        column: x => x.NutritionPlanId,
+                        principalTable: "NutritionPlans",
+                        principalColumn: "NutritionPlanId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -220,7 +257,7 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     WeightInKg = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
-                    HeightInMeters = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: false)
+                    HeightInMeters = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -322,60 +359,6 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                         column: x => x.TrainerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AppUserNutritionPlan",
-                columns: table => new
-                {
-                    NutritionPlansNutritionPlanId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AppUserNutritionPlan", x => new { x.NutritionPlansNutritionPlanId, x.UsersId });
-                    table.ForeignKey(
-                        name: "FK_AppUserNutritionPlan_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AppUserNutritionPlan_NutritionPlans_NutritionPlansNutritionPlanId",
-                        column: x => x.NutritionPlansNutritionPlanId,
-                        principalTable: "NutritionPlans",
-                        principalColumn: "NutritionPlanId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Meals",
-                columns: table => new
-                {
-                    MealId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MealName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    NutritionPlanId = table.Column<int>(type: "int", nullable: true),
-                    MealsCategoryId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Meals", x => x.MealId);
-                    table.ForeignKey(
-                        name: "FK_Meals_MealsCategory_MealsCategoryId",
-                        column: x => x.MealsCategoryId,
-                        principalTable: "MealsCategory",
-                        principalColumn: "MealsCategoryId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Meals_NutritionPlans_NutritionPlanId",
-                        column: x => x.NutritionPlanId,
-                        principalTable: "NutritionPlans",
-                        principalColumn: "NutritionPlanId",
                         onDelete: ReferentialAction.SetNull);
                 });
 
@@ -506,11 +489,6 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppUserNutritionPlan_UsersId",
-                table: "AppUserNutritionPlan",
-                column: "UsersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -547,6 +525,11 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 table: "AspNetUsers",
                 column: "DisplayName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_NutritionPlanId",
+                table: "AspNetUsers",
+                column: "NutritionPlanId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -630,9 +613,6 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AppUserNutritionPlan");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -678,10 +658,7 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
                 name: "WorkoutPlans");
 
             migrationBuilder.DropTable(
-                name: "MealsCategory");
-
-            migrationBuilder.DropTable(
-                name: "NutritionPlans");
+                name: "MealsCategories");
 
             migrationBuilder.DropTable(
                 name: "Memberships");
@@ -691,6 +668,9 @@ namespace GymMangamentSystem.Reposatory.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "NutritionPlans");
         }
     }
 }

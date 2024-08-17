@@ -112,11 +112,6 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             {
                 return new ApiResponse(400, "Exercise does not exist or already deleted");
             }
-            var existingExercise = _context.Exercises.FirstOrDefault(x => x.ExerciseName == exercise.ExerciseName && x.ExerciseId != id);
-            if (existingExercise != null)
-            {
-                return new ApiResponse(400, "Exercise already exists");
-            }
             try
             {
                 if (exercise.Image != null)

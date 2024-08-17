@@ -14,17 +14,21 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
         public void Configure(EntityTypeBuilder<NutritionPlan> builder)
         {
             builder.HasKey(np => np.NutritionPlanId);
+
             builder.HasMany(np => np.Users)
-                   .WithMany(u => u.NutritionPlans);
+                   .WithOne(u => u.nutritionPlan)
+                   .HasForeignKey(u => u.NutritionPlanId)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasMany(np => np.Meals)
                    .WithOne(m => m.NutritionPlan)
                    .HasForeignKey(m => m.NutritionPlanId)
-                   .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasQueryFilter(u => !u.IsDeleted);
+            builder.HasQueryFilter(np => !np.IsDeleted);
         }
     }
+
 
 
 }

@@ -18,8 +18,9 @@ namespace GymMangamentSystem.Core.Models.Business
         public string? ProfileImageName { get; set; }
         [NotMapped]
         public IFormFile? Image { get; set; }
+        public int? NutritionPlanId { get; set; }
+        public NutritionPlan nutritionPlan { get; set; }
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
-        public ICollection<NutritionPlan> NutritionPlans { get; set; }
         public ICollection<Attendance> Attendances { get; set; }
         public ICollection<BMIRecord> BMIRecords { get; set; }
         public ICollection<Feedback> Feedbacks { get; set; }

@@ -18,11 +18,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
             builder.HasMany(u => u.WorkoutPlans)
                 .WithOne(wp => wp.Trainer)
                 .HasForeignKey(wp => wp.TrainerId)
-                .OnDelete(DeleteBehavior.Restrict); 
-
-            builder.HasMany(u => u.NutritionPlans)
-                .WithMany(np => np.Users)
-                .UsingEntity<Dictionary<string, object>>();
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(u => u.Attendances)
                 .WithOne(a => a.User)
@@ -30,8 +26,8 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(u => u.BMIRecords)
-                .WithOne(hm => hm.User)
-                .HasForeignKey(hm => hm.UserId)
+                .WithOne(b => b.User)
+                .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(u => u.Feedbacks)
@@ -47,10 +43,17 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
             builder.HasMany(u => u.Memberships)
                 .WithOne(m => m.User)
                 .HasForeignKey(m => m.UserId)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(u => u.nutritionPlan) 
+                .WithMany(np => np.Users)
+                .HasForeignKey(u => u.NutritionPlanId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
+
+
 
 }
