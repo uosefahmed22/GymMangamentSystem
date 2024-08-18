@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GymMangamentSystem.Reposatory.Migrations
+namespace GymMangamentSystem.Reposatory.Data.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240818002836_UpdateNotification")]
-    partial class UpdateNotification
+    [Migration("20240818135431_initialMigration")]
+    partial class initialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -481,33 +481,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.ToTable("NutritionPlans");
                 });
 
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Payment", b =>
-                {
-                    b.Property<int>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MembershipId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("PaymentId");
-
-                    b.HasIndex("MembershipId");
-
-                    b.ToTable("Payments");
-                });
-
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutPlan", b =>
                 {
                     b.Property<int>("WorkoutPlanId")
@@ -826,17 +799,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Payment", b =>
-                {
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.Membership", "Membership")
-                        .WithMany("Payments")
-                        .HasForeignKey("MembershipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Membership");
-                });
-
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.WorkoutPlan", b =>
                 {
                     b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "Trainer")
@@ -928,11 +890,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.MealsCategory", b =>
                 {
                     b.Navigation("Meals");
-                });
-
-            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Membership", b =>
-                {
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.NutritionPlan", b =>

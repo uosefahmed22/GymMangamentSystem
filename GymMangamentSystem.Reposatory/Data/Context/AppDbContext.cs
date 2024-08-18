@@ -46,7 +46,6 @@ namespace GymMangamentSystem.Reposatory.Data.Context
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NutritionPlan> NutritionPlans { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
     }
 }

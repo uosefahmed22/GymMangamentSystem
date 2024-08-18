@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace GymMangamentSystem.Reposatory.Migrations
+namespace GymMangamentSystem.Reposatory.Data.Migrations
 {
     /// <inheritdoc />
     public partial class initialMigration : Migration
@@ -324,6 +324,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     NotificationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -398,7 +399,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     MembershipId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MembershipType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MembershipType = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -453,28 +454,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         principalTable: "WorkoutPlans",
                         principalColumn: "WorkoutPlanId",
                         onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Payments",
-                columns: table => new
-                {
-                    PaymentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    MembershipId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
-                    table.ForeignKey(
-                        name: "FK_Payments_Memberships_MembershipId",
-                        column: x => x.MembershipId,
-                        principalTable: "Memberships",
-                        principalColumn: "MembershipId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -599,11 +578,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_MembershipId",
-                table: "Payments",
-                column: "MembershipId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WorkoutPlans_TrainerId",
                 table: "WorkoutPlans",
                 column: "TrainerId");
@@ -643,10 +617,10 @@ namespace GymMangamentSystem.Reposatory.Migrations
                 name: "Meals");
 
             migrationBuilder.DropTable(
-                name: "Notifications");
+                name: "Memberships");
 
             migrationBuilder.DropTable(
-                name: "Payments");
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -659,9 +633,6 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
             migrationBuilder.DropTable(
                 name: "MealsCategories");
-
-            migrationBuilder.DropTable(
-                name: "Memberships");
 
             migrationBuilder.DropTable(
                 name: "Classes");
