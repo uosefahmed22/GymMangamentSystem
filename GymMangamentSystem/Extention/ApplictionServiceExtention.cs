@@ -47,6 +47,7 @@ namespace GymMangamentSystem.Apis.Extention
             service.AddScoped<IMealRepo, MealRepo>();
             service.AddScoped<INutritionPlanRepo, NutritionPlanRepo>();
             service.AddScoped<IMembershipRepo, MembershipRepo>();
+            service.AddScoped<INotificationRepo, NotificationRepo>();
 
 
             return service;

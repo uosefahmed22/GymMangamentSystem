@@ -21,6 +21,7 @@ namespace GymMangamentSystem.Apis.Helpers
             CreateMap<Meal,MealDto>().ReverseMap();
             CreateMap<NutritionPlan,NutritionPlanDto>().ReverseMap();
             CreateMap<Membership,MembershipDto>().ReverseMap();
+            CreateMap<Notification,NotificationDto>().ReverseMap();
         }
     }
 }
