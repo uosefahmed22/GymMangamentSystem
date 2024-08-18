@@ -24,11 +24,6 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                    .HasForeignKey(m => m.ClassId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(m => m.Payments)
-                   .WithOne(p => p.Membership)
-                   .HasForeignKey(p => p.MembershipId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
             builder.Property(m => m.Price)
                    .HasColumnType("decimal(18,2)");
 

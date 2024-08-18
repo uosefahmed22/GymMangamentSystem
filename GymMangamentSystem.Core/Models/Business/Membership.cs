@@ -24,6 +24,5 @@ namespace GymMangamentSystem.Core.Models.Business
         public AppUser User { get; set; }
         public int ClassId { get; set; }
         public Class Class { get; set; }
-        public ICollection<Payment> Payments { get; set; }
     }
 }
