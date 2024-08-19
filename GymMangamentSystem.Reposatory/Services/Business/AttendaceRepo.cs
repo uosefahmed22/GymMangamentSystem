@@ -28,15 +28,15 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         {
             try
             {
-                var existingClass = await _context.Classes.FindAsync(attendance.ClassId);
-                if (existingClass == null)
+                var UserCode = await _context.Users.FirstOrDefaultAsync(u => u.UserCode == attendance.UserCode);
+                if (UserCode == null)
                 {
-                    return new ApiResponse(404, "Class not found");
+                    return new ApiResponse(404, "User not found");
                 }
-                var AtteendanceEntity = _mapper.Map<Attendance>(attendance);
-                _context.Add(AtteendanceEntity);
+                attendance.IsAttended = true;
+                var newAttendance = _mapper.Map<Attendance>(attendance);
+                await _context.Attendances.AddAsync(newAttendance);
                 await _context.SaveChangesAsync();
-
                 return new ApiResponse(200, "Attendance added successfully");
             }
             catch (Exception ex)
@@ -44,19 +44,33 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-        public async Task<ApiResponse> DeleteAttendance(int id)
+        public async Task<IEnumerable<object>> GetAttendancesForUser(string userCode)
         {
-            var ExsistingAttendance = await _context.Attendances.FindAsync(id);
-            
-            if (ExsistingAttendance == null || ExsistingAttendance.IsDeleted == true)
-            {
-                return new ApiResponse(404, "Attendance not found");
-            }
             try
             {
-                ExsistingAttendance.IsDeleted = true;
-
-                _context.Entry(ExsistingAttendance).State = EntityState.Modified;
+                var UserCode = await _context.Users.FirstOrDefaultAsync(u => u.UserCode == userCode);
+                if (UserCode == null)
+                {
+                    return new List<object>();
+                }
+                var attendances = await _context.Attendances.Where(a => a.UserCode == userCode).ToListAsync();
+                return attendances;
+            }
+            catch (Exception ex)
+            {
+                return new List<object>();
+            }
+        }
+        public async Task<ApiResponse> DeleteAttendance(int id)
+        {
+            try
+            {
+                var attandanceId = await _context.Attendances.FirstOrDefaultAsync(a => a.AttendanceId == id);
+                if (attandanceId == null)
+                {
+                    return new ApiResponse(404, "Attendance not found");
+                }
+                _context.Attendances.Remove(attandanceId);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Attendance deleted successfully");
             }
@@ -64,28 +78,6 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             {
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
-
         }
-        public async Task<IEnumerable<object>> GetAttendancesForUser(string userId)
-        {
-            try
-            {
-                var attendances = await _context.Attendances
-                    .Where(a => a.UserId == userId && !a.IsDeleted)
-                    .Select(a => new
-                    {
-                        a.IsAttended,
-                        a.AttendanceDate
-                    })
-                    .ToListAsync();
-
-                return attendances;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error: " + ex.Message);
-            }
-        }
-
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GymMangamentSystem.Reposatory.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240819215932_initialMigration")]
+    [Migration("20240819232955_initialMigration")]
     partial class initialMigration
     {
         /// <inheritdoc />
@@ -60,6 +60,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("MembershipId")
+                        .HasColumnType("int");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -89,6 +92,10 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<string>("UserCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -98,8 +105,11 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DisplayName")
-                        .IsUnique();
+                    b.HasIndex("DisplayName");
+
+                    b.HasIndex("MembershipId")
+                        .IsUnique()
+                        .HasFilter("[MembershipId] IS NOT NULL");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -134,15 +144,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AttendanceId");
 
                     b.HasIndex("ClassId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Attendances");
                 });
@@ -410,15 +418,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("MembershipId");
 
                     b.HasIndex("ClassId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Memberships");
                 });
@@ -674,6 +676,10 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUser", b =>
                 {
+                    b.HasOne("GymMangamentSystem.Core.Models.Business.Membership", "membership")
+                        .WithOne("User")
+                        .HasForeignKey("GymMangamentSystem.Core.Models.Business.AppUser", "MembershipId");
+
                     b.HasOne("GymMangamentSystem.Core.Models.Business.NutritionPlan", "nutritionPlan")
                         .WithMany("Users")
                         .HasForeignKey("NutritionPlanId")
@@ -713,6 +719,8 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.Navigation("RefreshTokens");
 
+                    b.Navigation("membership");
+
                     b.Navigation("nutritionPlan");
                 });
 
@@ -724,15 +732,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
-                        .WithMany("Attendances")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Class");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.BMIRecord", b =>
@@ -812,15 +812,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GymMangamentSystem.Core.Models.Business.AppUser", "User")
-                        .WithMany("Memberships")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Class");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Notification", b =>
@@ -896,13 +888,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.AppUser", b =>
                 {
-                    b.Navigation("Attendances");
-
                     b.Navigation("BMIRecords");
 
                     b.Navigation("Feedbacks");
-
-                    b.Navigation("Memberships");
 
                     b.Navigation("Notifications");
 
@@ -924,6 +912,12 @@ namespace GymMangamentSystem.Reposatory.Migrations
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.MealsCategory", b =>
                 {
                     b.Navigation("Meals");
+                });
+
+            modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.Membership", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GymMangamentSystem.Core.Models.Business.NutritionPlan", b =>

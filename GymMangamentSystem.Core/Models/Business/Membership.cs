@@ -20,7 +20,6 @@ namespace GymMangamentSystem.Core.Models.Business
         public DateTime EndDate { get; set; }
         public decimal Price { get; set; }
         public bool IsDeleted { get; set; }
-        public string UserId { get; set; }
         public AppUser User { get; set; }
         public int ClassId { get; set; }
         public Class Class { get; set; }

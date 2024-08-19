@@ -1,4 +1,5 @@
 ﻿using GymMangamentSystem.Core.Enums.Auth;
+using GymMangamentSystem.Core.Enums.Business;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,5 +20,6 @@ namespace GymMangamentSystem.Core.Models.Identity
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string ConfirmPassword { get; set; }
         public UserRoleEnum UserRole { get; set; }
+        public MembershipType MembershipType { get; set; }
     }
 }

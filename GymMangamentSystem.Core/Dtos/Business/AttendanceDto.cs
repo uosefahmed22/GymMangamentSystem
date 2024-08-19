@@ -11,7 +11,7 @@ namespace GymMangamentSystem.Core.Dtos.Business
     {
         public int? AttendanceId { get; set; }
         public bool IsAttended { get; set; }
-        public string? UserId { get; set; }
+        public string? UserCode { get; set; }
         public int ClassId { get; set; }
     }
 }

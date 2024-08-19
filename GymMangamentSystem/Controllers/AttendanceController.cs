@@ -18,18 +18,19 @@ namespace GymMangamentSystem.Apis.Controllers
             _attendaceRepo = attendaceRepo;
         }
         [Authorize(Roles = "Admin, Receptionist")]
-        [HttpGet]
-        public async Task<IActionResult> GetAttendances()
+        [HttpGet("getattendances")]
+        public async Task<IActionResult> GetAttendances(string userCode)
         {
-
-            var response = await _attendaceRepo.GetAttendancesForUser(User.Identity.Name);
-            var UserIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
-            if (UserIdClaim == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("UserIdClaim claim not found in the token");
+                return BadRequest(ModelState);
             }
-            var result = await _attendaceRepo.GetAttendancesForUser(UserIdClaim.Value);
-            return Ok(result);
+            var IsExsistUser = await _attendaceRepo.GetAttendancesForUser(userCode);
+            if (IsExsistUser == null)
+            {
+                return NotFound();
+            }
+            return Ok(IsExsistUser);
         }
 
         [Authorize(Roles = "Admin, Receptionist")]
@@ -40,13 +41,6 @@ namespace GymMangamentSystem.Apis.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var trainerIdClaim = User.Claims.FirstOrDefault(c => c.Type == "TrainerId");
-            if (trainerIdClaim == null)
-            {
-                return BadRequest("TrainerId claim not found in the token");
-            }
-            attendance.UserId = trainerIdClaim.Value;
-
             var response = await _attendaceRepo.AddAttendance(attendance);
             if (response.StatusCode == 200)
             {
@@ -54,7 +48,6 @@ namespace GymMangamentSystem.Apis.Controllers
             }
             return BadRequest(response);
         }
-
         [Authorize(Roles = "Admin, Receptionist")]
         [HttpDelete]
         public async Task<IActionResult> DeleteAttendance(int id)

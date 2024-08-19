@@ -28,34 +28,35 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> CreateMembership(MembershipDto membership)
         {
-            var exsistingMembership = await _context.Memberships.FirstOrDefaultAsync(x => x.UserId == membership.UserId);
-            if (exsistingMembership != null)
-            {
-                return new ApiResponse(400, "User already has a membership, please update the existing membership");
-            }
-            try
-            {
-                if (membership.Image != null)
-                {
-                    var fileResult = await _imageService.UploadImageAsync(membership.Image);
-                    if (fileResult.Item1 == 1)
-                    {
-                        membership.ImageUrl = fileResult.Item2;
-                    }
-                    else
-                    {
-                        return new ApiResponse(400, fileResult.Item2);
-                    }
-                }
-                var mappedMembership = _mapper.Map<Membership>(membership);
-                _context.Memberships.Add(mappedMembership);
-                await _context.SaveChangesAsync();
-                return new ApiResponse(200, "Membership added successfully");
-            }
-            catch (Exception ex)
-            {
-                return new ApiResponse(500, "Error: " + ex.Message);
-            }
+            //var exsistingMembership = await _context.Memberships.FirstOrDefaultAsync(x => x.UserId == membership.UserId);
+            //if (exsistingMembership != null)
+            //{
+            //    return new ApiResponse(400, "User already has a membership, please update the existing membership");
+            //}
+            //try
+            //{
+            //    if (membership.Image != null)
+            //    {
+            //        var fileResult = await _imageService.UploadImageAsync(membership.Image);
+            //        if (fileResult.Item1 == 1)
+            //        {
+            //            membership.ImageUrl = fileResult.Item2;
+            //        }
+            //        else
+            //        {
+            //            return new ApiResponse(400, fileResult.Item2);
+            //        }
+            //    }
+            //    var mappedMembership = _mapper.Map<Membership>(membership);
+            //    _context.Memberships.Add(mappedMembership);
+            //    await _context.SaveChangesAsync();
+            //    return new ApiResponse(200, "Membership added successfully");
+            //}
+            //catch (Exception ex)
+            //{
+            //    return new ApiResponse(500, "Error: " + ex.Message);
+            //}
+            throw new NotImplementedException();
         }
         public async Task<ApiResponse> DeleteMembership(int id)
         {
@@ -137,7 +138,6 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 existingMembership.ImageUrl = membership.ImageUrl;
                 existingMembership.MembershipType = (Core.Enums.Business.MembershipType)membership.MembershipType;
                 existingMembership.Price = membership.Price;
-                membership.UserId = existingMembership.UserId;
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Membership updated successfully");
             }

@@ -12,7 +12,7 @@ namespace GymMangamentSystem.Core.IServices.Business
     public interface IAttendaceRepo
     {
         Task<ApiResponse> AddAttendance(AttendanceDto attendance);
+        Task<IEnumerable<object>> GetAttendancesForUser(string userCode);
         Task<ApiResponse> DeleteAttendance(int id);
-        Task<IEnumerable<object>> GetAttendancesForUser(string userId);
     }
 }
