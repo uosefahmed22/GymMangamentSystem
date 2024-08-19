@@ -12,5 +12,7 @@ namespace GymMangamentSystem.Core.Dtos.Auth
     {
         public UserRoleEnum Role { get; set; }
         public string Token { get; set; }
+        public string RefreshToken { get; set; }
+
     }
 }

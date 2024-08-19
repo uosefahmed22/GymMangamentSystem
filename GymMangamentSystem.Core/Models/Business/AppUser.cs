@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using GymMangamentSystem.Core.Models.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace GymMangamentSystem.Core.Models.Business
         public ICollection<Feedback> Feedbacks { get; set; }
         public ICollection<Notification> Notifications { get; set; }
         public ICollection<Membership> Memberships { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 
 }

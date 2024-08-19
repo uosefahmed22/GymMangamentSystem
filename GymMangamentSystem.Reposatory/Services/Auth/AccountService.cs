@@ -97,12 +97,16 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 return new ApiResponse(400, "Email not confirmed. Please check your email inbox to verify your email address.");
             }
 
+            var (jwtToken, refreshToken) = await _TokenService.CreateTokenAsync(user);
+
             return new ApiResponse(200, "Login successful", new UserDto
             {
                 Role = (UserRoleEnum)user.UserRole,
-                Token = await _TokenService.CreateTokenAsync(user)
+                Token = jwtToken,
+                RefreshToken = refreshToken.Token 
             });
         }
+
         public async Task<ApiResponse> ForgetPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -206,6 +210,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             return new ApiResponse(200, "Email verification has been resent to your email successfully. Please verify it!");
         }
 
+        
+        
+        
         //Helper Methods
         public async Task<bool> ConfirmUserEmailAsync(string userId, string token)
         {
