@@ -14,10 +14,8 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
         public void Configure(EntityTypeBuilder<Membership> builder)
         {
             builder.HasKey(m => m.MembershipId);
-            builder.HasOne(m => m.User)
-                   .WithMany(u => u.Memberships)
-                   .HasForeignKey(m => m.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(m => m.User);
+
 
             builder.HasOne(m => m.Class)
                    .WithMany(c => c.Memberships)

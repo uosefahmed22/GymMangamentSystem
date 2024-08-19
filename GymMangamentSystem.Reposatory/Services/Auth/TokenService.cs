@@ -33,12 +33,10 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 throw new ArgumentNullException(nameof(user), "User cannot be null");
             }
 
-            // Create claims for the JWT
             var authClaims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email ?? throw new InvalidOperationException("User email cannot be null")),
-            new Claim(ClaimTypes.GivenName, user.DisplayName ?? string.Empty),
             new Claim("TrainerId", user.Id.ToString()),
             new Claim("UserId", user.Id.ToString())
         };
@@ -49,10 +47,8 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 throw new InvalidOperationException("User roles cannot be null or empty");
             }
 
-            // Add user roles to claims
             authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            // Create JWT security key
             var jwtKey = _configuration["JWT:Key"];
             if (string.IsNullOrEmpty(jwtKey))
             {
@@ -61,7 +57,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
 
             var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
-            // Create JWT token
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
@@ -72,7 +67,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            // Create Refresh Token
             var refreshToken = new RefreshToken
             {
                 Token = Guid.NewGuid().ToString(),
@@ -80,7 +74,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 Created = DateTime.UtcNow
             };
 
-            // Save the refresh token for the user (make sure to persist this to the database)
             user.RefreshTokens.Add(refreshToken);
             var result = await _userManager.UpdateAsync(user);
 
@@ -89,7 +82,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 throw new Exception("Failed to update user with refresh token");
             }
 
-            // Return JWT token and the new refresh token
             return (jwtToken, refreshToken);
         }
 
@@ -145,7 +137,5 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 };
             }
         }
-
-
     }
 }

@@ -17,16 +17,17 @@ namespace GymMangamentSystem.Core.Models.Business
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? ProfileImageName { get; set; }
+        public string UserCode { get; set; }
         [NotMapped]
         public IFormFile? Image { get; set; }
         public int? NutritionPlanId { get; set; }
         public NutritionPlan nutritionPlan { get; set; }
+        public int? MembershipId { get; set; }
+        public Membership membership { get; set; }
         public ICollection<WorkoutPlan> WorkoutPlans { get; set; }
-        public ICollection<Attendance> Attendances { get; set; }
         public ICollection<BMIRecord> BMIRecords { get; set; }
         public ICollection<Feedback> Feedbacks { get; set; }
         public ICollection<Notification> Notifications { get; set; }
-        public ICollection<Membership> Memberships { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 

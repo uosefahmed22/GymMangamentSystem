@@ -20,11 +20,6 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                 .HasForeignKey(wp => wp.TrainerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(u => u.Attendances)
-                .WithOne(a => a.User)
-                .HasForeignKey(a => a.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasMany(u => u.BMIRecords)
                 .WithOne(b => b.User)
                 .HasForeignKey(b => b.UserId)
@@ -40,17 +35,14 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasMany(u => u.Memberships)
-                .WithOne(m => m.User)
-                .HasForeignKey(m => m.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasOne(u => u.nutritionPlan) 
                 .WithMany(np => np.Users)
                 .HasForeignKey(u => u.NutritionPlanId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasQueryFilter(u => !u.IsDeleted);
+
+            builder.HasIndex(u => u.DisplayName).IsUnique(false);
         }
     }
 

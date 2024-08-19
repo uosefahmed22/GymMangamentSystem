@@ -1,11 +1,13 @@
 ﻿using GymMangamentSystem.Core.Dtos.Auth;
 using GymMangamentSystem.Core.Enums.Auth;
+using GymMangamentSystem.Core.Enums.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Auth;
 using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Core.Models.Identity;
 using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -51,6 +53,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             {
                 return new ApiResponse(400, "User with this email already exists.");
             }
+            var currentUserCount = await _userManager.Users.CountAsync();
+
+            var userCode = GenerateUserCode(dto.MembershipType, currentUserCount);
 
             user = new AppUser
             {
@@ -58,7 +63,8 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 Email = dto.Email,
                 UserName = dto.Email.Split('@')[0],
                 UserRole = (int)dto.UserRole,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                UserCode = userCode
             };
             var Result = await _userManager.CreateAsync(user, dto.Password);
 
@@ -103,10 +109,11 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             {
                 Role = (UserRoleEnum)user.UserRole,
                 Token = jwtToken,
-                RefreshToken = refreshToken.Token 
+                RefreshToken = refreshToken.Token,
+                UserCode = user.UserCode
+
             });
         }
-
         public async Task<ApiResponse> ForgetPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -186,7 +193,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
 
             return new ApiResponse(400, "Failed to change password.");
         }
-
         public async Task<ApiResponse> ResendConfirmationEmailAsync(string email, Func<string, string, string> generateCallBackUrl)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -209,8 +215,6 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
 
             return new ApiResponse(200, "Email verification has been resent to your email successfully. Please verify it!");
         }
-
-        
         
         
         //Helper Methods
@@ -259,5 +263,42 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 await client.DisconnectAsync(true, Cancellation);
             }
         }
+        private string GenerateUserCode(MembershipType membershipType, int currentUserCount)
+        {
+            char prefix;
+            switch (membershipType)
+            {
+                case MembershipType.Gold_1Month:
+                case MembershipType.Gold_3Months:
+                case MembershipType.Gold_6Months:
+                    prefix = 'G';
+                    break;
+                case MembershipType.Silver_1Month:
+                case MembershipType.Silver_3Months:
+                case MembershipType.Silver_6Months:
+                    prefix = 'S';
+                    break;
+                case MembershipType.Platinum_1Month:
+                case MembershipType.Platinum_3Months:
+                case MembershipType.Platinum_6Months:
+                    prefix = 'P';
+                    break;
+                case MembershipType.Bronze_1Month:
+                case MembershipType.Bronze_3Months:
+                case MembershipType.Bronze_6Months:
+                    prefix = 'B';
+                    break;
+                case MembershipType.Diamond_1Month:
+                case MembershipType.Diamond_3Months:
+                case MembershipType.Diamond_6Months:
+                    prefix = 'D';
+                    break;
+                default:
+                    prefix = 'U';
+                    break;
+            }
+            return $"{prefix}{currentUserCount + 1}";
+        }
+
     }
 }
