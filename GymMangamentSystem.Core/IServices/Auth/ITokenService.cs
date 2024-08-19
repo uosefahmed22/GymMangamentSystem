@@ -1,4 +1,5 @@
 ﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace GymMangamentSystem.Core.IServices.Auth
 {
     public interface ITokenService
     {
-        Task<string> CreateTokenAsync(AppUser user);
+        Task<(string, RefreshToken)> CreateTokenAsync(AppUser user);
+        Task<(string, RefreshToken)> RefreshTokenAsync(string refreshToken);
+        Task<bool> RevokeTokenAsync(string refreshToken);
     }
+
 }
