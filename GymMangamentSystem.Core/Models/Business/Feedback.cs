@@ -11,10 +11,8 @@ namespace GymMangamentSystem.Core.Models.Business
         public int FeedbackId { get; set; }
         public string? Comments { get; set; }
         public int Rating { get; set; }
-        public bool IsDeleted { get; set; }
         public string UserId { get; set; }
         public AppUser User { get; set; }
+        public string TrainerId { get; set; }
     }
-
-
 }

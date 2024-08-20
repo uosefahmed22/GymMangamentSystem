@@ -28,7 +28,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> AddExerciseCategory(ExerciseCategoryDto exerciseCategoryDto)
         {
-            var existingCategory = _context.ExerciseCategories.FirstOrDefault(x => x.CategoryName == exerciseCategoryDto.CategoryName);
+            var existingCategory =await _context.ExerciseCategories.FirstOrDefaultAsync(x => x.CategoryName == exerciseCategoryDto.CategoryName);
             if (exerciseCategoryDto == null || existingCategory != null)
             {
                 return new ApiResponse(400, "Exercise Category is null or already exists");
@@ -62,7 +62,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteExerciseCategory(int id)
         {
-            var exerciseCategory = _context.ExerciseCategories.Find(id);
+            var exerciseCategory =await _context.ExerciseCategories.FindAsync(id);
             if (exerciseCategory == null || exerciseCategory.IsDeleted == true)
             {
                 return new ApiResponse(404, "Exercise Category not found");
