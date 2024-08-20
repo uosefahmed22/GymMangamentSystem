@@ -12,7 +12,6 @@ namespace GymMangamentSystem.Core.IServices.Business
     public interface IBMIRecordRepo
     {
         Task<IEnumerable<object>> GetBMIRecordsForUser(string userId);
-        Task<object> GetBMIRecordById(int id);
         Task<ApiResponse> AddBMIRecord(BMIRecordDto bmiRecord);
         Task<ApiResponse> DeleteBMIRecord(int id);
     }

@@ -19,7 +19,7 @@ namespace GymMangamentSystem.Apis.Controllers
             _bMIRecordRepo = bMIRecordRepo;
         }
         [Authorize]
-        [HttpGet("GetBMIRecordsForUser")]
+        [HttpGet("getBMIRecordsForUser")]
         public async Task<IActionResult> GetBMIRecordsForUser()
         {
             try
@@ -42,29 +42,7 @@ namespace GymMangamentSystem.Apis.Controllers
             }
         }
         [Authorize]
-        [HttpGet("GetBMIRecord")]
-        public async Task<IActionResult> GetBMIRecord(int id)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var result = await _bMIRecordRepo.GetBMIRecordById(id);
-                if (result == null)
-                {
-                    return NotFound($"BMI record with id {id} not found.");
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponse(404, ex.Message));
-            }
-        }
-        [Authorize]
-        [HttpPost("AddBMIRecord")]
+        [HttpPost("addBMIRecord")]
         public async Task<IActionResult> AddBMIRecord(BMIRecordDto bmiRecord)
         {
             try
@@ -89,7 +67,7 @@ namespace GymMangamentSystem.Apis.Controllers
             }
         }
         [Authorize]
-        [HttpDelete("DeleteBMIRecord")]
+        [HttpDelete("deleteBMIRecord")]
         public async Task<IActionResult> DeleteBMIRecord(int id)
         {
             try

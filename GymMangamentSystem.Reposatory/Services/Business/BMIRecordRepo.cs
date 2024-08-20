@@ -66,21 +66,6 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-        public async Task<object> GetBMIRecordById(int id)
-        {
-            var bmiRecord = await _context.bMIRecords.FindAsync(id);
-
-            if (bmiRecord == null || bmiRecord.IsDeleted == true)
-            {
-                return null;
-            }
-
-            return new
-            {
-                Category = bmiRecord.Category.ToString(),
-                bmiRecord.MeasurementDate
-            };
-        }
         public async Task<IEnumerable<object>> GetBMIRecordsForUser(string userId)
         {
             try
@@ -102,8 +87,5 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-
-
-
     }
 }
