@@ -44,13 +44,13 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         public async Task<ApiResponse> DeleteFeedback(int id)
         {
             var exsisitingFeedback = await _context.Feedbacks.FindAsync(id);
-            if (exsisitingFeedback == null || exsisitingFeedback.IsDeleted == true)
+            if (exsisitingFeedback == null)
             {
                 return new ApiResponse(404, "Feedback not found");
             }
             try
             {
-                exsisitingFeedback.IsDeleted = true;
+                _context.Feedbacks.Remove(exsisitingFeedback);
                 _context.Update(exsisitingFeedback);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Feedback deleted successfully");
@@ -64,7 +64,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         {
             try
             {
-                var feedbacks =await _context.Feedbacks.Where(x => x.IsDeleted == false).ToListAsync();
+                var feedbacks =await _context.Feedbacks.ToListAsync();
                 var feedbacksDto = _mapper.Map<IEnumerable<FeedbackDto>>(feedbacks);
                 return feedbacksDto;
             }
@@ -78,7 +78,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             try
             {
                 var feedback = await _context.Feedbacks.FindAsync(id);
-                if (feedback == null || feedback.IsDeleted == true)
+                if (feedback == null)
                 {
                     return null;
                 }
@@ -94,13 +94,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         public async Task<ApiResponse> UpdateFeedback(int id, FeedbackDto feedbackDto)
         {
             var exsisitingFeedback = await _context.Feedbacks.FindAsync(id);
-            if (exsisitingFeedback == null || exsisitingFeedback.IsDeleted == true)
+            if (exsisitingFeedback == null)
             {
                 return new ApiResponse(404, "Feedback not found");
             }
             try
             {
-                exsisitingFeedback = _mapper.Map<Feedback>(feedbackDto);
+                exsisitingFeedback.Comments = feedbackDto.Comments;
+                exsisitingFeedback.Rating = feedbackDto.Rating;
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Feedback updated successfully");
             }

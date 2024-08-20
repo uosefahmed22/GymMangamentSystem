@@ -28,7 +28,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> AddExercise(ExerciseDto exercise)
         {
-            var existingExercise = _context.Exercises.FirstOrDefault(x => x.ExerciseName == exercise.ExerciseName);
+            var existingExercise =await _context.Exercises.FirstOrDefaultAsync(x => x.ExerciseName == exercise.ExerciseName);
             if (existingExercise != null)
             {
                 return new ApiResponse(400, "Exercise already exists");
@@ -59,7 +59,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteExercise(int exerciseId)
         {
-            var exercise = _context.Exercises.FirstOrDefault(x => x.ExerciseId == exerciseId);
+            var exercise =await _context.Exercises.FirstOrDefaultAsync(x => x.ExerciseId == exerciseId);
             if (exercise == null)
             {
                 return new ApiResponse(400, "Exercise not found");

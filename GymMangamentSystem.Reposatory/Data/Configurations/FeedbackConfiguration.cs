@@ -19,7 +19,6 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                    .HasForeignKey(f => f.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
 }

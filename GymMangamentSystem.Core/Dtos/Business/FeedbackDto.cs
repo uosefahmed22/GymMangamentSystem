@@ -13,5 +13,6 @@ namespace GymMangamentSystem.Core.Dtos.Business
         public string? Comments { get; set; }
         public int Rating { get; set; }
         public string? UserId { get; set; }
+        public string? TrainerId { get; set; }
     }
 }
