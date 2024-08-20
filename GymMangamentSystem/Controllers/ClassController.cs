@@ -56,9 +56,9 @@ namespace GymMangamentSystem.Apis.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin, Receptionist")]
+        [Authorize(Roles = "Admin,Receptionist,Tainer")]
         [HttpPost]
-        public async Task<IActionResult> AddClass(ClassDto classDto)
+        public async Task<IActionResult> AddClass([FromForm]ClassDto classDto)
         {
             if (!ModelState.IsValid)
             {
@@ -78,7 +78,7 @@ namespace GymMangamentSystem.Apis.Controllers
             return BadRequest(response);
         }
 
-        [Authorize(Roles = "Admin, Receptionist")]
+        [Authorize(Roles = "Admin,Receptionist,Tainer")]
         [HttpDelete]
         public async Task<IActionResult> DeleteClass(int id)
         {
@@ -94,9 +94,9 @@ namespace GymMangamentSystem.Apis.Controllers
             return BadRequest(response);
         }
 
-        [Authorize(Roles = "Admin, Receptionist")]
+        [Authorize(Roles = "Admin,Receptionist,Tainer")]
         [HttpPut]
-        public async Task<IActionResult> UpdateClass(int id, [FromBody] ClassDto classDto)
+        public async Task<IActionResult> UpdateClass(int id, [FromForm] ClassDto classDto)
         {
             if (!ModelState.IsValid)
             {
