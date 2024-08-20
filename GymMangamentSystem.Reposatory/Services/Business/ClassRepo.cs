@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
+using GymMangamentSystem.Core.IServices;
 using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Reposatory.Data.Context;
@@ -17,16 +18,35 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     {
         private readonly AppDBContext _context;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
 
-        public ClassRepo(AppDBContext context,IMapper mapper)
+        public ClassRepo(AppDBContext context,IMapper mapper,IImageService imageService)
         {
             _context = context;
             _mapper = mapper;
+            _imageService = imageService;
         }
         public async Task<ApiResponse> AddClass(ClassDto classDto)
         {
             try
             {
+                var existingClass =await _context.Classes.FirstOrDefaultAsync(x => x.ClassName == classDto.ClassName);
+                if (classDto == null || existingClass != null)
+                {
+                    return new ApiResponse(400, "Class is null or already exists");
+                }
+                if (classDto.Image != null)
+                {
+                    var fileResult = await _imageService.UploadImageAsync(classDto.Image);
+                    if (fileResult.Item1 == 1)
+                    {
+                        classDto.ImageUrl = fileResult.Item2;
+                    }
+                    else
+                    {
+                        return new ApiResponse(400, fileResult.Item2);
+                    }
+                }
                 var AtteendanceEntity = _mapper.Map<Class>(classDto);
                 await _context.AddAsync(AtteendanceEntity);
                 await _context.SaveChangesAsync();
@@ -98,12 +118,29 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 {
                     return new ApiResponse(404, "Class not found");
                 }
+                if (classDto.Image != null)
+                {
+                    if(!string.IsNullOrEmpty(existingClass.ImageUrl))
+                    {
+                       await _imageService.DeleteImageAsync(existingClass.ImageUrl);
+                    }
+                    var fileResult = await _imageService.UploadImageAsync(classDto.Image);
+                    if (fileResult.Item1 == 1)
+                    {
+                        classDto.ImageUrl = fileResult.Item2;
+                    }
+                    else
+                    {
+                        return new ApiResponse(400, fileResult.Item2);
+                    }
+                }
 
                 existingClass.ClassName = classDto.ClassName;
                 existingClass.Description = classDto.Description;
                 existingClass.StartTime = classDto.StartTime;
                 existingClass.EndTime = classDto.EndTime;
                 existingClass.ImageUrl = classDto.ImageUrl;
+
                 _context.Update(existingClass);
                 await _context.SaveChangesAsync();
 
@@ -114,6 +151,5 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-
     }
 }
