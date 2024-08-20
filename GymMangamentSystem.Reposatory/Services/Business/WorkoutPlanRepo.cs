@@ -28,7 +28,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> CreateWorkoutPlan(WorkoutPlanDto workoutPlanDto)
         {
-            var exsistingWorkoutPlan = _context.WorkoutPlans.FirstOrDefault(x => x.PlanName == workoutPlanDto.PlanName);
+            var exsistingWorkoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.PlanName == workoutPlanDto.PlanName);
             if (workoutPlanDto == null || exsistingWorkoutPlan != null)
             {
                 return new ApiResponse(400, "Workout Plan is null or already exists");
@@ -48,7 +48,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                     }
                 }
                 var workoutPlan = _mapper.Map<WorkoutPlan>(workoutPlanDto);
-                _context.WorkoutPlans.Add(workoutPlan);
+                await _context.WorkoutPlans.AddAsync(workoutPlan);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Workout Plan added successfully");
             }
@@ -59,7 +59,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteWorkoutPlan(int workoutPlanId)
         {
-            var exsistingWorkoutPlan = _context.WorkoutPlans.FirstOrDefault(x => x.WorkoutPlanId == workoutPlanId);
+            var exsistingWorkoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.WorkoutPlanId == workoutPlanId);
             if (exsistingWorkoutPlan == null || exsistingWorkoutPlan.IsDeleted == true)
             {
                 return new ApiResponse(400, "Workout Plan does not exist or already deleted");
