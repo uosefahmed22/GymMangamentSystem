@@ -31,7 +31,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         {
             try
             {
-                var existingCategory = _context.MealsCategories.FirstOrDefault(x => x.CategoryName == mealsCategory.CategoryName);
+                var existingCategory =await _context.MealsCategories.FirstOrDefaultAsync(x => x.CategoryName == mealsCategory.CategoryName);
                 if (existingCategory != null)
                 {
                     return new ApiResponse(400, "Meals Category already exists");
@@ -51,7 +51,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 }
 
                 var mappedCategory = _mapper.Map<MealsCategory>(mealsCategory);
-                _context.MealsCategories.Add(mappedCategory);
+                await _context.MealsCategories.AddAsync(mappedCategory);
                 await _context.SaveChangesAsync();
 
                 return new ApiResponse(200, "Meals Category added successfully");

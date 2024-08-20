@@ -9,7 +9,7 @@ namespace GymMangamentSystem.Core.Dtos.Business
 {
     public class NotificationDto
     {
-        public int NotificationId { get; set; }
+        public int? NotificationId { get; set; }
         public string Message { get; set; }
         public DateTime? Date { get; set; } = DateTime.Now;
     }
