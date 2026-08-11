@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Core.Models.Business;
@@ -43,11 +44,11 @@ namespace GymMangamentSystem.Apis.Controllers
         }
 
         [HttpGet("getAllClasses")]
-        public async Task<IActionResult> GetAllClasses()
+        public async Task<IActionResult> GetAllClasses([FromQuery] PaginationParameters pagination)
         {
             try
             {
-                var result = await _classRepo.GetClasses();
+                var result = await _classRepo.GetClasses(pagination);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -1,16 +1,14 @@
-﻿using GymMangamentSystem.Core.Dtos.Auth;
+using GymMangamentSystem.Core.Dtos.Auth;
 using GymMangamentSystem.Core.Enums.Auth;
 using GymMangamentSystem.Core.Enums.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Auth;
 using GymMangamentSystem.Core.Models.Business;
 using GymMangamentSystem.Core.Models.Identity;
-using MailKit.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using MimeKit;
+using System.Security.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,23 +21,23 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
     {
         #region MyRegion
         private readonly UserManager<AppUser> _userManager;
-        private readonly MailSettings _mailSettings;
         private readonly ITokenService _TokenService;
         private readonly IOtpService _otpService;
+        private readonly IEmailService _emailService;
         private readonly IMemoryCache _cache;
         private readonly SignInManager<AppUser> _signInManager;
 
         public AccountService(UserManager<AppUser> userManager,
-            IOptionsMonitor<MailSettings> options,
             ITokenService tokenService,
             IOtpService otpService,
+            IEmailService emailService,
             IMemoryCache cache,
             SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
-            _mailSettings = options.CurrentValue;
             _TokenService = tokenService;
             _otpService = otpService;
+            _emailService = emailService;
             _cache = cache;
             _signInManager = signInManager;
         }
@@ -53,9 +51,7 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             {
                 return new ApiResponse(400, "User with this email already exists.");
             }
-            var currentUserCount = await _userManager.Users.CountAsync();
-
-            var userCode = GenerateUserCode(dto.MembershipType, currentUserCount);
+            var userCode = GenerateUserCode(dto.MembershipType);
 
             user = new AppUser
             {
@@ -79,7 +75,7 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             var EmailConfirmation = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var callBackUrl = generateCallBackUrl(EmailConfirmation, user.Id);
             var emailBody = $"<h1>Dear {user.UserName}! Welcome To BNS360.</h1><p>Please <a href='{callBackUrl}'>Click Here</a> To Confirm Your Email.</p>";
-            await SendEmailAsync(user.Email, "Email Confirmation", emailBody);
+            await SendEmailAsync(user.Email ?? throw new InvalidOperationException("User email is missing."), "Email Confirmation", emailBody);
 
             return new ApiResponse(200, "Email verification has been sent to your email successfully. Please verify it!");
 
@@ -162,6 +158,7 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             var resetResult = await _userManager.ResetPasswordAsync(user, resetToken, dto.Password);
             if (resetResult.Succeeded)
             {
+                _cache.Remove(dto.Email);
                 return new ApiResponse(200, "Password reset successfully.");
             }
 
@@ -211,7 +208,7 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             var callBackUrl = generateCallBackUrl(emailConfirmationToken, user.Id);
             var emailBody = $"<h1>Dear {user.UserName}! Welcome To BNS360.</h1><p>Please <a href='{callBackUrl}'>Click Here</a> To Confirm Your Email.</p>";
 
-            await SendEmailAsync(user.Email, "Email Confirmation", emailBody);
+            await SendEmailAsync(user.Email ?? throw new InvalidOperationException("User email is missing."), "Email Confirmation", emailBody);
 
             return new ApiResponse(200, "Email verification has been resent to your email successfully. Please verify it!");
         }
@@ -244,26 +241,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
         }
         public async Task SendEmailAsync(string To, string Subject, string Body, CancellationToken Cancellation = default)
         {
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(_mailSettings.DisplayedName, _mailSettings.Email));
-            message.To.Add(new MailboxAddress("", To));
-            message.Subject = Subject;
-
-            message.Body = new TextPart("html")
-            {
-                Text = Body
-            };
-
-            using (var client = new MailKit.Net.Smtp.SmtpClient())
-            {
-                await client.ConnectAsync(_mailSettings.SmtpServer, _mailSettings.Port,
-                    SecureSocketOptions.StartTls, Cancellation);
-                await client.AuthenticateAsync(_mailSettings.Email, _mailSettings.Password, Cancellation);
-                await client.SendAsync(message, Cancellation);
-                await client.DisconnectAsync(true, Cancellation);
-            }
+            await _emailService.SendAsync(To, Subject, Body, Cancellation);
         }
-        private string GenerateUserCode(MembershipType membershipType, int currentUserCount)
+        private static string GenerateUserCode(MembershipType membershipType)
         {
             char prefix;
             switch (membershipType)
@@ -297,7 +277,7 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                     prefix = 'U';
                     break;
             }
-            return $"{prefix}{currentUserCount + 1}";
+            return $"{prefix}{RandomNumberGenerator.GetHexString(8)}";
         }
 
     }

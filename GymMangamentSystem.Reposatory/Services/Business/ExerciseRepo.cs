@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class ExerciseRepo : IExerciseRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public ExerciseRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public ExerciseRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -75,7 +76,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-        public async Task<ExerciseDto> GetExerciseById(int exerciseId)
+        public async Task<ExerciseDto?> GetExerciseById(int exerciseId)
         {
             var exercise =await _context.Exercises.FirstOrDefaultAsync(x => x.ExerciseId == exerciseId);
             if (exercise == null)
@@ -92,11 +93,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<ExerciseDto>> GetExerciseList()
+        public async Task<IEnumerable<ExerciseDto>> GetExerciseList(PaginationParameters? pagination = null)
         {
             try
             {
-                var ExerciseList = await _context.Exercises.Where(x => x.IsDeleted == false).ToListAsync();
+                var ExerciseList = await _context.Exercises.AsNoTracking().OrderBy(x => x.ExerciseId).ApplyPagination(pagination).ToListAsync();
                 var ExerciseListDto = _mapper.Map<List<ExerciseDto>>(ExerciseList);
                 return ExerciseListDto;
             }

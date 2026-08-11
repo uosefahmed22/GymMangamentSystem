@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
 using Microsoft.AspNetCore.Authorization;
@@ -39,11 +40,11 @@ namespace GymMangamentSystem.Apis.Controllers
             }
         }
         [HttpGet("getAllFeedbacks")]
-        public async Task<IActionResult> GetAllFeedbacks()
+        public async Task<IActionResult> GetAllFeedbacks([FromQuery] PaginationParameters pagination)
         {
             try
             {
-                var result = await _feedbackRepo.GetAllFeedbacks();
+                var result = await _feedbackRepo.GetAllFeedbacks(pagination);
                 return Ok(result);
             }
             catch (Exception ex)

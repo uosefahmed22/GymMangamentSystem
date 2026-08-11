@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
 using Azure;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
@@ -24,9 +24,9 @@ namespace GymMangamentSystem.Apis.Controllers
             _exerciseCategory = exerciseCategory;
         }
         [HttpGet("getExerciseCategories")]
-        public async Task<IActionResult> GetExerciseCategories()
+        public async Task<IActionResult> GetExerciseCategories([FromQuery] PaginationParameters pagination)
         {
-            var response = await _exerciseCategory.GetExerciseCategories();
+            var response = await _exerciseCategory.GetExerciseCategories(pagination);
             try
             {
                 return Ok(response);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +8,10 @@ namespace GymMangamentSystem.Core.Models.Identity
 {
     public class MailSettings
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string SmtpServer { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string SmtpServer { get; set; } = string.Empty;
         public int Port { get; set; }
-        public string DisplayedName { get; set; }
+        public string DisplayedName { get; set; } = string.Empty;
     }
 }

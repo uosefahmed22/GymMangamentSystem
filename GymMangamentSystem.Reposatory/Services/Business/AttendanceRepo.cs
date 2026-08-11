@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
+using GymMangamentSystem.Core.IServices;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
@@ -14,12 +16,12 @@ using GymMangamentSystem.Reposatory.Data.Context;
 
 namespace GymMangamentSystem.Reposatory.Services.Business
 {
-    public class AttendaceRepo : IAttendaceRepo
+    public class AttendanceRepo : IAttendanceRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
 
-        public AttendaceRepo(AppDBContext context, IMapper mapper)
+        public AttendanceRepo(AppDBContext context, IAppMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -44,7 +46,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<object>> GetAttendancesForUser(string userCode)
+        public async Task<IEnumerable<object>> GetAttendancesForUser(string userCode, PaginationParameters? pagination = null)
         {
             try
             {
@@ -53,10 +55,15 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 {
                     return new List<object>();
                 }
-                var attendances = await _context.Attendances.Where(a => a.UserCode == userCode).ToListAsync();
+                var attendances = await _context.Attendances
+                    .AsNoTracking()
+                    .Where(a => a.UserCode == userCode)
+                    .OrderByDescending(a => a.AttendanceDate)
+                    .ApplyPagination(pagination)
+                    .ToListAsync();
                 return attendances;
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<object>();
             }

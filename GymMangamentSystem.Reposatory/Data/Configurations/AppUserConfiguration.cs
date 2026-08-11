@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,7 +13,8 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<AppUser> builder)
         {
-            builder.HasIndex(u => u.DisplayName).IsUnique();
+            builder.HasIndex(u => u.DisplayName);
+            builder.HasIndex(u => u.UserCode).IsUnique();
 
             builder.HasMany(u => u.WorkoutPlans)
                 .WithOne(wp => wp.Trainer)
@@ -35,14 +36,13 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasOne(u => u.nutritionPlan) 
+            builder.HasOne(u => u.NutritionPlan)
                 .WithMany(np => np.Users)
                 .HasForeignKey(u => u.NutritionPlanId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasQueryFilter(u => !u.IsDeleted);
 
-            builder.HasIndex(u => u.DisplayName).IsUnique(false);
         }
     }
 

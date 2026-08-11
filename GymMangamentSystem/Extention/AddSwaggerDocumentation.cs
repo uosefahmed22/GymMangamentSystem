@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 
 namespace GymMangamentSystem.Apis.Extention
 {
@@ -6,9 +6,10 @@ namespace GymMangamentSystem.Apis.Extention
     {
         public static IServiceCollection AddSwaggerDocumentationService(this IServiceCollection services)
         {
+            services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "StoreAPI", Version = "v1" });
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Gym Management API", Version = "v1" });
 
                 var securityScheme = new OpenApiSecurityScheme
                 {

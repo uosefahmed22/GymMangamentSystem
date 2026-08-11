@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
 using Microsoft.AspNetCore.Authorization;
@@ -11,26 +12,26 @@ namespace GymMangamentSystem.Apis.Controllers
     [ApiController]
     public class AttendanceController : ControllerBase
     {
-        private readonly IAttendaceRepo _attendaceRepo;
+        private readonly IAttendanceRepo _attendaceRepo;
 
-        public AttendanceController(IAttendaceRepo attendaceRepo)
+        public AttendanceController(IAttendanceRepo attendaceRepo)
         {
             _attendaceRepo = attendaceRepo;
         }
         [Authorize(Roles = "Admin, Receptionist")]
         [HttpGet("getattendances")]
-        public async Task<IActionResult> GetAttendances(string userCode)
+        public async Task<IActionResult> GetAttendances(string userCode, [FromQuery] PaginationParameters pagination)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var IsExsistUser = await _attendaceRepo.GetAttendancesForUser(userCode);
-            if (IsExsistUser == null)
+            var existingAttendances = await _attendaceRepo.GetAttendancesForUser(userCode, pagination);
+            if (existingAttendances == null)
             {
                 return NotFound();
             }
-            return Ok(IsExsistUser);
+            return Ok(existingAttendances);
         }
 
         [Authorize(Roles = "Admin, Receptionist")]

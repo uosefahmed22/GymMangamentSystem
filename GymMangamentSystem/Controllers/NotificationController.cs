@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Core.Models.Business;
 using Microsoft.AspNetCore.Authorization;
@@ -19,11 +20,11 @@ namespace GymMangamentSystem.Apis.Controllers
         }
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetNotifications()
+        public async Task<IActionResult> GetNotifications([FromQuery] PaginationParameters pagination)
         {
             try
             {
-                var notifications = await _notification.GetNotifications();
+                var notifications = await _notification.GetNotifications(pagination);
                 return Ok(notifications);
             }
             catch (Exception ex)

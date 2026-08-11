@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class MembershipRepo : IMembershipRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public MembershipRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public MembershipRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -76,11 +77,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<MembershipDto>> GetAllMemberships()
+        public async Task<IEnumerable<MembershipDto>> GetAllMemberships(PaginationParameters? pagination = null)
         {
             try
             {
-                var memberships = await _context.Memberships.ToListAsync();
+                var memberships = await _context.Memberships.AsNoTracking().OrderBy(x => x.MembershipId).ApplyPagination(pagination).ToListAsync();
                 var mappedMemberships = _mapper.Map<IEnumerable<MembershipDto>>(memberships);
                 return mappedMemberships;
             }
@@ -89,7 +90,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<MembershipDto> GetMembershipById(int id)
+        public async Task<MembershipDto?> GetMembershipById(int id)
         {
             var membership = await _context.Memberships.FirstOrDefaultAsync(x => x.MembershipId == id);
             try

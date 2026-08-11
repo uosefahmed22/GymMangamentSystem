@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
 using Microsoft.AspNetCore.Authorization;
@@ -18,9 +19,9 @@ namespace GymMangamentSystem.Apis.Controllers
             _workoutPlanRepo = workoutPlanRepo;
         }
         [HttpGet("getWorkoutPlans")]
-        public async Task<IActionResult> GetWorkoutPlans()
+        public async Task<IActionResult> GetWorkoutPlans([FromQuery] PaginationParameters pagination)
         {
-            var response = await _workoutPlanRepo.GetWorkoutPlans();
+            var response = await _workoutPlanRepo.GetWorkoutPlans(pagination);
             try
             {
                 return Ok(response);

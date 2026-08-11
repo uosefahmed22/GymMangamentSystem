@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +12,13 @@ using Microsoft.Extensions.Hosting;
 
 namespace GymMangamentSystem.Core.Errors
 {
-    public class ExeptionMiddleWares
+    public class ExceptionMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly ILogger<ExeptionMiddleWares> logger;
+        private readonly ILogger<ExceptionMiddleware> logger;
         private readonly IHostEnvironment env;
 
-        public ExeptionMiddleWares(RequestDelegate next, ILogger<ExeptionMiddleWares> logger, IHostEnvironment env)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
         {
             this.next = next;
             this.logger = logger;
@@ -38,7 +38,7 @@ namespace GymMangamentSystem.Core.Errors
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                var response = env.IsDevelopment() ? new ApiExceptionResponse((int)HttpStatusCode.InternalServerError, ex.Message, ex.StackTrace.ToString())
+                var response = env.IsDevelopment() ? new ApiExceptionResponse((int)HttpStatusCode.InternalServerError, ex.Message, ex.StackTrace ?? string.Empty)
                                                    : new ApiExceptionResponse((int)HttpStatusCode.InternalServerError);
 
                 var options = new JsonSerializerOptions()

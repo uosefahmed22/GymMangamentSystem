@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Enums.Auth;
+using GymMangamentSystem.Core.Enums.Auth;
 using GymMangamentSystem.Core.Errors;
 using System;
 using System.Collections.Generic;
@@ -11,9 +11,9 @@ namespace GymMangamentSystem.Core.Dtos.Auth
     public class UserDto : ApiResponse
     {
         public UserRoleEnum Role { get; set; }
-        public string Token { get; set; }
-        public string RefreshToken { get; set; }
-        public string UserCode { get; set; }
+        public string Token { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
+        public string UserCode { get; set; } = string.Empty;
 
     }
 }

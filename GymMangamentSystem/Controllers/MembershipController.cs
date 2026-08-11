@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
 using Microsoft.AspNetCore.Authorization;
@@ -18,11 +19,11 @@ namespace GymMangamentSystem.Apis.Controllers
             _membershipRepo = membershipRepo;
         }
         [HttpGet("GetAllMemberships")]
-        public async Task<IActionResult> GetAllMemberships()
+        public async Task<IActionResult> GetAllMemberships([FromQuery] PaginationParameters pagination)
         {
             try
             {
-                var result = await _membershipRepo.GetAllMemberships();
+                var result = await _membershipRepo.GetAllMemberships(pagination);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class ExerciseCategoryRepo : IExerciseCategoryRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public ExerciseCategoryRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public ExerciseCategoryRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -69,8 +70,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
             try
             {
-                exerciseCategory.IsDeleted = true;
-                _context.Update(exerciseCategory);
+                _context.ExerciseCategories.Remove(exerciseCategory);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Exercise Category deleted successfully");
             }
@@ -80,11 +80,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
 
         }
-        public async Task<IEnumerable<ExerciseCategoryDto>> GetExerciseCategories()
+        public async Task<IEnumerable<ExerciseCategoryDto>> GetExerciseCategories(PaginationParameters? pagination = null)
         {
             try
             {
-                var exerciseCategories = await _context.ExerciseCategories.Where(x => x.IsDeleted == false).ToListAsync();
+                var exerciseCategories = await _context.ExerciseCategories.AsNoTracking().OrderBy(x => x.ExerciseCategoryId).ApplyPagination(pagination).ToListAsync();
                 var exerciseCategoriesDto = _mapper.Map<List<ExerciseCategoryDto>>(exerciseCategories);
                 return exerciseCategoriesDto;
             }
@@ -93,7 +93,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<ExerciseCategoryDto> GetExerciseCategory(int id)
+        public async Task<ExerciseCategoryDto?> GetExerciseCategory(int id)
         {
             try
             {

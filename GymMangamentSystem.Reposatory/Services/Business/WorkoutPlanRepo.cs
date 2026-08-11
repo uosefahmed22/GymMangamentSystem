@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class WorkoutPlanRepo : IWorkoutPlanRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public WorkoutPlanRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public WorkoutPlanRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -28,8 +29,8 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> CreateWorkoutPlan(WorkoutPlanDto workoutPlanDto)
         {
-            var exsistingWorkoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.PlanName == workoutPlanDto.PlanName);
-            if (workoutPlanDto == null || exsistingWorkoutPlan != null)
+            var existingWorkoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.PlanName == workoutPlanDto.PlanName);
+            if (workoutPlanDto == null || existingWorkoutPlan != null)
             {
                 return new ApiResponse(400, "Workout Plan is null or already exists");
             }
@@ -59,14 +60,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteWorkoutPlan(int workoutPlanId)
         {
-            var exsistingWorkoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.WorkoutPlanId == workoutPlanId);
-            if (exsistingWorkoutPlan == null || exsistingWorkoutPlan.IsDeleted == true)
+            var existingWorkoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.WorkoutPlanId == workoutPlanId);
+            if (existingWorkoutPlan == null || existingWorkoutPlan.IsDeleted == true)
             {
                 return new ApiResponse(400, "Workout Plan does not exist or already deleted");
             }
             try
             {
-                exsistingWorkoutPlan.IsDeleted = true;
+                _context.WorkoutPlans.Remove(existingWorkoutPlan);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Workout Plan deleted successfully");
             }
@@ -75,7 +76,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-        public async Task<WorkoutPlanDto> GetWorkoutPlan(int workoutPlanId)
+        public async Task<WorkoutPlanDto?> GetWorkoutPlan(int workoutPlanId)
         {
             var workoutPlan =await _context.WorkoutPlans.FirstOrDefaultAsync(x => x.WorkoutPlanId == workoutPlanId);
             if (workoutPlan == null)
@@ -92,11 +93,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<WorkoutPlanDto>> GetWorkoutPlans()
+        public async Task<IEnumerable<WorkoutPlanDto>> GetWorkoutPlans(PaginationParameters? pagination = null)
         {
             try
             {
-                var workoutPlans =await _context.WorkoutPlans.Where(x => x.IsDeleted == false).ToListAsync();
+                var workoutPlans = await _context.WorkoutPlans.AsNoTracking().OrderBy(x => x.WorkoutPlanId).ApplyPagination(pagination).ToListAsync();
                 var workoutPlansDto = _mapper.Map<List<WorkoutPlanDto>>(workoutPlans);
                 return workoutPlansDto;
             }

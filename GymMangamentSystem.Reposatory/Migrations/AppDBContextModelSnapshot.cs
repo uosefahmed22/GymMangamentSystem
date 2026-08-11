@@ -91,7 +91,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -118,6 +118,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.HasIndex("NutritionPlanId");
 
+                    b.HasIndex("UserCode")
+                        .IsUnique();
+
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
@@ -140,11 +143,13 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("AttendanceId");
 
                     b.HasIndex("ClassId");
+
+                    b.HasIndex("UserCode");
 
                     b.ToTable("Attendances");
                 });
@@ -161,6 +166,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("HeightInMeters")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
@@ -173,7 +181,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<DateTime>("MeasurementDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -185,7 +193,7 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.HasKey("BMIRecordId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "MeasurementDate");
 
                     b.ToTable("BMIRecords", (string)null);
                 });
@@ -201,6 +209,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<string>("ClassName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -236,6 +247,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ExerciseId"));
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -283,6 +297,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
@@ -332,6 +349,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MealId"));
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -373,6 +393,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -394,6 +417,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -431,6 +457,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -459,6 +488,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NutritionPlanId"));
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -485,6 +517,9 @@ namespace GymMangamentSystem.Reposatory.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WorkoutPlanId"));
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()

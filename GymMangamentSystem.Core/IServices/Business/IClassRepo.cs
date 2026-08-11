@@ -1,5 +1,6 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
+using GymMangamentSystem.Core.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace GymMangamentSystem.Core.IServices.Business
         public Task<ApiResponse> AddClass(ClassDto classDto);
         Task<ApiResponse> UpdateClass(int id, ClassDto classDto);
         public Task<ApiResponse> DeleteClass(int id);
-        public Task<ClassDto> GetClass(int id);
-        public Task<IEnumerable<ClassDto>> GetClasses();
+        public Task<ClassDto?> GetClass(int id);
+        public Task<IEnumerable<ClassDto>> GetClasses(PaginationParameters? pagination = null);
     }
 }

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class FeedbackRepo : IFeedbackRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public FeedbackRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public FeedbackRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -43,15 +44,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteFeedback(int id)
         {
-            var exsisitingFeedback = await _context.Feedbacks.FindAsync(id);
-            if (exsisitingFeedback == null)
+            var existingFeedback = await _context.Feedbacks.FindAsync(id);
+            if (existingFeedback == null)
             {
                 return new ApiResponse(404, "Feedback not found");
             }
             try
             {
-                _context.Feedbacks.Remove(exsisitingFeedback);
-                _context.Update(exsisitingFeedback);
+                _context.Feedbacks.Remove(existingFeedback);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Feedback deleted successfully");
             }
@@ -60,11 +60,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<FeedbackDto>> GetAllFeedbacks()
+        public async Task<IEnumerable<FeedbackDto>> GetAllFeedbacks(PaginationParameters? pagination = null)
         {
             try
             {
-                var feedbacks =await _context.Feedbacks.ToListAsync();
+                var feedbacks = await _context.Feedbacks.AsNoTracking().OrderBy(x => x.FeedbackId).ApplyPagination(pagination).ToListAsync();
                 var feedbacksDto = _mapper.Map<IEnumerable<FeedbackDto>>(feedbacks);
                 return feedbacksDto;
             }
@@ -73,7 +73,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<FeedbackDto> GetFeedbackById(int id)
+        public async Task<FeedbackDto?> GetFeedbackById(int id)
         {
             try
             {
@@ -93,15 +93,15 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> UpdateFeedback(int id, FeedbackDto feedbackDto)
         {
-            var exsisitingFeedback = await _context.Feedbacks.FindAsync(id);
-            if (exsisitingFeedback == null)
+            var existingFeedback = await _context.Feedbacks.FindAsync(id);
+            if (existingFeedback == null)
             {
                 return new ApiResponse(404, "Feedback not found");
             }
             try
             {
-                exsisitingFeedback.Comments = feedbackDto.Comments;
-                exsisitingFeedback.Rating = feedbackDto.Rating;
+                existingFeedback.Comments = feedbackDto.Comments;
+                existingFeedback.Rating = feedbackDto.Rating;
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Feedback updated successfully");
             }

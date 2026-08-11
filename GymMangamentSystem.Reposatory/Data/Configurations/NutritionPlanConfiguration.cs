@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,7 +16,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
             builder.HasKey(np => np.NutritionPlanId);
 
             builder.HasMany(np => np.Users)
-                   .WithOne(u => u.nutritionPlan)
+                   .WithOne(u => u.NutritionPlan)
                    .HasForeignKey(u => u.NutritionPlanId)
                    .OnDelete(DeleteBehavior.SetNull);
 

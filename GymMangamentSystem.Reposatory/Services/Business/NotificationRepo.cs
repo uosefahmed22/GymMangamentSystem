@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
+using GymMangamentSystem.Core.IServices;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
@@ -16,9 +18,9 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class NotificationRepo : INotificationRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
 
-        public NotificationRepo(AppDBContext context, IMapper mapper)
+        public NotificationRepo(AppDBContext context, IAppMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -46,8 +48,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
             try
             {
-                existingNotification.IsDeleted = true;
-                _context.Notifications.Update(existingNotification);
+                _context.Notifications.Remove(existingNotification);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Notification deleted successfully");
             } 
@@ -56,11 +57,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
                
         }
-        public async Task<IEnumerable<NotificationDto>> GetNotifications()
+        public async Task<IEnumerable<NotificationDto>> GetNotifications(PaginationParameters? pagination = null)
         {
             try
             {
-                var notifications = await _context.Notifications.Where(x => x.IsDeleted == false).ToListAsync();
+                var notifications = await _context.Notifications.AsNoTracking().OrderByDescending(x => x.NotificationId).ApplyPagination(pagination).ToListAsync();
                 var notificationDtos = _mapper.Map<IEnumerable<NotificationDto>>(notifications);
                 return notificationDtos;
             }

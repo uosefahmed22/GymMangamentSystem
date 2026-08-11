@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -12,11 +12,11 @@ namespace GymMangamentSystem.Core.Dtos.Business
     public class ExerciseDto
     {
         public int? ExerciseId { get; set; }
-        public string ExerciseName { get; set; }
-        public string Description { get; set; }
+        public string ExerciseName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
         [NotMapped]
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         public int Repetitions { get; set; }
         public int Sets { get; set; }
         public int? WorkoutPlanId { get; set; }

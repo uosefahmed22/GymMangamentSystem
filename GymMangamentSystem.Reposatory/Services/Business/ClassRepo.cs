@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class ClassRepo : IClassRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public ClassRepo(AppDBContext context,IMapper mapper,IImageService imageService)
+        public ClassRepo(AppDBContext context,IAppMapper mapper,IImageService imageService)
         {
             _context = context;
             _mapper = mapper;
@@ -47,8 +48,8 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                         return new ApiResponse(400, fileResult.Item2);
                     }
                 }
-                var AtteendanceEntity = _mapper.Map<Class>(classDto);
-                await _context.AddAsync(AtteendanceEntity);
+                var classEntity = _mapper.Map<Class>(classDto);
+                await _context.AddAsync(classEntity);
                 await _context.SaveChangesAsync();
 
                 return new ApiResponse(200, "Class added successfully");
@@ -60,15 +61,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteClass(int id)
         {
-            var ExsistingClass = await _context.Classes.FindAsync(id);
-            if (ExsistingClass == null || ExsistingClass.IsDeleted==true)
+            var existingClass = await _context.Classes.FindAsync(id);
+            if (existingClass == null || existingClass.IsDeleted==true)
             {
                 return new ApiResponse(404, "Class not found");
             }
             try
             {
-                ExsistingClass.IsDeleted = true;
-                _context.Update(ExsistingClass);
+                _context.Classes.Remove(existingClass);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Class deleted successfully");
             }
@@ -77,7 +77,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-        public async Task<ClassDto> GetClass(int id)
+        public async Task<ClassDto?> GetClass(int id)
         {
             try
             {
@@ -95,11 +95,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<ClassDto>> GetClasses()
+        public async Task<IEnumerable<ClassDto>> GetClasses(PaginationParameters? pagination = null)
         {
             try
             {
-                var Classes = await _context.Classes.Where(x => x.IsDeleted == false)
+                var Classes = await _context.Classes
+                    .AsNoTracking()
+                    .OrderBy(x => x.ClassId)
+                    .ApplyPagination(pagination)
                     .ToListAsync();
                 var ClassesDto = _mapper.Map<IEnumerable<ClassDto>>(Classes);
                 return ClassesDto;

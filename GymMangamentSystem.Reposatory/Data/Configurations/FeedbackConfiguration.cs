@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,6 +14,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
         public void Configure(EntityTypeBuilder<Feedback> builder)
         {
             builder.HasKey(f => f.FeedbackId);
+            builder.HasQueryFilter(feedback => !feedback.User.IsDeleted);
             builder.HasOne(f => f.User)
                    .WithMany(u => u.Feedbacks)
                    .HasForeignKey(f => f.UserId)

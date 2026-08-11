@@ -5,6 +5,7 @@ using GymMangamentSystem.Core.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace GymMangamentSystem.Apis.Controllers
@@ -14,9 +15,12 @@ namespace GymMangamentSystem.Apis.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService)
+        private readonly ClientSettings _clientSettings;
+
+        public AccountController(IAccountService accountService, IOptions<ClientSettings> clientSettings)
         {
             _accountService = accountService;
+            _clientSettings = clientSettings.Value;
         }
 
         [HttpPost("login")]
@@ -28,13 +32,7 @@ namespace GymMangamentSystem.Apis.Controllers
             }
 
             var result = await _accountService.LoginAsync(dto);
-
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [HttpPost("register")]
@@ -45,11 +43,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _accountService.RegisterAsync(model, GenerateCallBackUrl);
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [HttpPost("forget-password")]
@@ -60,11 +54,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _accountService.ForgetPassword(email);
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [Authorize]
@@ -76,11 +66,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
             var result = _accountService.VerfiyOtp(dto);
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result.Message);
-            }
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [Authorize]
@@ -92,11 +78,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _accountService.ResetPasswordAsync(dto);
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [Authorize]
@@ -121,11 +103,7 @@ namespace GymMangamentSystem.Apis.Controllers
 
 
             var result = await _accountService.ChangePasswordAsync(userId, dto.OldPassword, dto.NewPassword);
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [HttpPost("resend-confirmation-email")]
@@ -136,11 +114,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _accountService.ResendConfirmationEmailAsync(email, GenerateCallBackUrl);
-            if (result.StatusCode == 400)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return ToActionResult(result);
         }
 
         [HttpGet("confirm-email")]
@@ -150,7 +124,12 @@ namespace GymMangamentSystem.Apis.Controllers
 
             if (result)
             {
-                return RedirectPermanent(@"https://www.google.com/webhp?authuser=0");
+                if (Uri.TryCreate(_clientSettings.EmailConfirmationRedirectUrl, UriKind.Absolute, out var redirectUrl))
+                {
+                    return Redirect(redirectUrl.ToString());
+                }
+
+                return Ok(new ApiResponse(200, "Email confirmed successfully."));
             }
             else
             {
@@ -158,6 +137,12 @@ namespace GymMangamentSystem.Apis.Controllers
             }
         }
         
+        private IActionResult ToActionResult(ApiResponse result)
+        {
+            var statusCode = result.StatusCode ?? StatusCodes.Status500InternalServerError;
+            return StatusCode(statusCode, result);
+        }
+
         //Helper Method
         private string GenerateCallBackUrl(string token, string userId)
         {

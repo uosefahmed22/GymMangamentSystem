@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Enums.Business;
+using GymMangamentSystem.Core.IServices;
+using GymMangamentSystem.Core.Enums.Business;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -9,19 +10,20 @@ using System.Threading.Tasks;
 
 namespace GymMangamentSystem.Core.Models.Business
 {
-    public class Membership
+    public class Membership : ISoftDeletable
     {
         public int MembershipId { get; set; }
         public string? ImageUrl { get; set; }
         [NotMapped]
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         public MembershipType MembershipType { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal Price { get; set; }
         public bool IsDeleted { get; set; }
-        public AppUser User { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public AppUser User { get; set; } = null!;
         public int ClassId { get; set; }
-        public Class Class { get; set; }
+        public Class Class { get; set; } = null!;
     }
 }

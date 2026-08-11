@@ -19,9 +19,10 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
         }
         public string GenerateOtp(string email)
         {
+            _cache.Remove(email);
             var key = KeyGeneration.GenerateRandomKey(32);
             StoreKeyInCache(email, key);
-            var totp = new Totp(key, step: 3600);
+            var totp = new Totp(key, step: 300);
             return totp.ComputeTotp();
         }
         public bool IsValidOtp(string email, string otp)
@@ -30,25 +31,26 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
             if (key is null)
                 return false;
 
-            var totp = new Totp(key, step: 3600);
-            var isValiddOtp = totp.VerifyTotp(otp, out _, new VerificationWindow(1, 1));
-            if (!isValiddOtp)
+            var totp = new Totp(key, step: 300);
+            var isValidOtp = totp.VerifyTotp(otp, out _, new VerificationWindow(0, 0));
+            if (!isValidOtp)
                 return false;
 
-            _cache.Remove(email);
+            _cache.Remove(GetOtpCacheKey(email));
             _cache.Set(email, true, TimeSpan.FromMinutes(10));
 
-            return isValiddOtp;
+            return true;
         }
         private void StoreKeyInCache(string email, byte[] key)
             =>
-            _cache.Set(email, key, TimeSpan.FromMinutes(60));
+            _cache.Set(GetOtpCacheKey(email), key, TimeSpan.FromMinutes(5));
         private byte[]? RetrieveKeyFromCache(string email)
         {
-            if (_cache.TryGetValue(email, out byte[]? key))
+            if (_cache.TryGetValue(GetOtpCacheKey(email), out byte[]? key))
                 return key;
 
             return null;
         }
+        private static string GetOtpCacheKey(string email) => $"otp:key:{email}";
     }
 }

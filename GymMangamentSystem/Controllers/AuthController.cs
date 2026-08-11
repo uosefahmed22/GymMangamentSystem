@@ -14,12 +14,10 @@ namespace GymMangamentSystem.Apis.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ITokenService _authService;
-        private readonly UserManager<AppUser> _userManager;
 
-        public AuthController(ITokenService authService, UserManager<AppUser> userManager)
+        public AuthController(ITokenService authService)
         {
             _authService = authService;
-            _userManager = userManager;
         }
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] TokenRequest request)

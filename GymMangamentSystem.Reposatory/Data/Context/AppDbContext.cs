@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -41,7 +41,7 @@ namespace GymMangamentSystem.Reposatory.Data.Context
         public DbSet<ExerciseCategory> ExerciseCategories { get; set; }
         public DbSet<MealsCategory> MealsCategories { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<BMIRecord> bMIRecords { get; set; }
+        public DbSet<BMIRecord> BMIRecords { get; set; }
         public DbSet<Meal> Meals { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Notification> Notifications { get; set; }

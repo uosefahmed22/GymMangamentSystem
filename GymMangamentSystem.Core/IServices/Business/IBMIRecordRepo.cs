@@ -1,5 +1,6 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
+using GymMangamentSystem.Core.Models.Common;
 using GymMangamentSystem.Core.Models.Business;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace GymMangamentSystem.Core.IServices.Business
 {
     public interface IBMIRecordRepo
     {
-        Task<IEnumerable<object>> GetBMIRecordsForUser(string userId);
+        Task<IEnumerable<object>> GetBMIRecordsForUser(string userId, PaginationParameters? pagination = null);
         Task<ApiResponse> AddBMIRecord(BMIRecordDto bmiRecord);
         Task<ApiResponse> DeleteBMIRecord(int id);
     }

@@ -1,5 +1,7 @@
 using GymMangamentSystem.Apis.Extention;
+using GymMangamentSystem.Apis.Helpers;
 using GymMangamentSystem.Core.Errors;
+using Serilog;
 using System.Text.Json.Serialization;
 
 namespace GymMangamentSystem
@@ -10,6 +12,15 @@ namespace GymMangamentSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Host.UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .WriteTo.File(
+                    path: "logs/gym-api-.log",
+                    rollingInterval: RollingInterval.Day,
+                    retainedFileCountLimit: 14));
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
@@ -17,25 +28,28 @@ namespace GymMangamentSystem
             });
 
             builder.Services.AddIdentityServices(builder.Configuration);
-            builder.Services.AddSwaggerService();
-            builder.Services.AddAplictionService();
+            builder.Services.AddApplicationServices();
             builder.Services.AddMemoryCache();
+            builder.Services.Configure<ClientSettings>(
+                builder.Configuration.GetSection(ClientSettings.SectionName));
+
+            var allowedOrigins = builder.Configuration
+                .GetSection($"{ClientSettings.SectionName}:AllowedOrigins")
+                .Get<string[]>() ?? [];
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("MyPolicy", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                    policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
                 });
             });
 
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
             builder.Services.AddSwaggerDocumentationService();
 
             var app = builder.Build();
 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
-            app.UseMiddleware<ExeptionMiddleWares>();
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseSwagger();
             if (app.Environment.IsDevelopment())
@@ -53,6 +67,7 @@ namespace GymMangamentSystem
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSerilogRequestLogging();
             app.UseRouting();
             app.UseCors("MyPolicy");
 

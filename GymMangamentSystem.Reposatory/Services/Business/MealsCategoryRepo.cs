@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class MealsCategoryRepo : IMealsCategoryRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public MealsCategoryRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public MealsCategoryRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -63,14 +64,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> Delete(int mealsCategoryId)
         {
-            var ExsisitingCategory = await _context.MealsCategories.FirstOrDefaultAsync(x => x.MealsCategoryId == mealsCategoryId);
-            if (ExsisitingCategory == null || ExsisitingCategory.IsDeleted == true)
+            var existingCategory = await _context.MealsCategories.FirstOrDefaultAsync(x => x.MealsCategoryId == mealsCategoryId);
+            if (existingCategory == null || existingCategory.IsDeleted == true)
             {
                 return new ApiResponse(400, "Meals Category not found");
             }
             try
             {
-                ExsisitingCategory.IsDeleted = true;
+                _context.MealsCategories.Remove(existingCategory);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Meals Category deleted successfully");
             }
@@ -79,11 +80,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<MealsCategoryDto>> GetAllMealsCategory()
+        public async Task<IEnumerable<MealsCategoryDto>> GetAllMealsCategory(PaginationParameters? pagination = null)
         {
             try
             {
-                var mealsCategories = await _context.MealsCategories.Where(x => x.IsDeleted == false).ToListAsync();
+                var mealsCategories = await _context.MealsCategories.AsNoTracking().OrderBy(x => x.MealsCategoryId).ApplyPagination(pagination).ToListAsync();
                 var mappedCategories = _mapper.Map<List<MealsCategoryDto>>(mealsCategories);
                 return mappedCategories;
             }
@@ -92,11 +93,12 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<MealsCategoryDto> GetMealsCategoryById(int mealsCategoryId)
+        public async Task<MealsCategoryDto?> GetMealsCategoryById(int mealsCategoryId)
         {
             try
             {
-                var mealsCategory = await _context.MealsCategories.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(x => x.MealsCategoryId == mealsCategoryId);
+                var mealsCategory = await _context.MealsCategories.AsNoTracking().FirstOrDefaultAsync(x => x.MealsCategoryId == mealsCategoryId);
+                if (mealsCategory is null) return null;
                 var mappedCategory = _mapper.Map<MealsCategoryDto>(mealsCategory);
                 return mappedCategory;
             }

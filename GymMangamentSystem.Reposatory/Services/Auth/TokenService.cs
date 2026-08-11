@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Globalization;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -55,24 +56,29 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 throw new InvalidOperationException("JWT key cannot be null or empty");
             }
 
+            var durationValue = _configuration["JWT:DurationInDays"];
+            if (!double.TryParse(
+                durationValue,
+                NumberStyles.Float,
+                CultureInfo.InvariantCulture,
+                out var durationInDays) || durationInDays <= 0)
+            {
+                throw new InvalidOperationException("JWT duration must be a positive number");
+            }
+
             var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddDays(double.Parse(_configuration["JWT:DurationInDays"])),
+                expires: DateTime.UtcNow.AddDays(durationInDays),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha256)
             );
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            var refreshToken = new RefreshToken
-            {
-                Token = Guid.NewGuid().ToString(),
-                Expires = DateTime.UtcNow.AddDays(30),
-                Created = DateTime.UtcNow
-            };
+            var refreshToken = GenerateRefreshToken();
 
             user.RefreshTokens.Add(refreshToken);
             var result = await _userManager.UpdateAsync(user);
@@ -101,7 +107,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 throw new UnauthorizedAccessException("Refresh token has expired");
 
             refreshTokenEntity.Revoked = DateTime.UtcNow;
-            await _userManager.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                throw new InvalidOperationException("Failed to revoke old refresh token");
 
             return await CreateTokenAsync(user);
         }
@@ -119,7 +127,9 @@ namespace GymMangamentSystem.Reposatory.Services.Auth
                 return false;
 
             refreshTokenEntity.Revoked = DateTime.UtcNow;
-            await _userManager.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                throw new InvalidOperationException("Failed to revoke refresh token");
 
             return true;
         }

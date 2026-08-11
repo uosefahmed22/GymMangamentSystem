@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,6 +17,9 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Attendance> builder)
         {
+            builder.HasQueryFilter(attendance => !attendance.Class.IsDeleted);
+            builder.HasIndex(attendance => attendance.UserCode);
+
             builder.HasOne(a => a.Class)
                    .WithMany(c => c.Attendances)
                    .HasForeignKey(a => a.ClassId)

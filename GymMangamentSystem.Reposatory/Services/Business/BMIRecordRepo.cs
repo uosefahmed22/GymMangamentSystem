@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
+using GymMangamentSystem.Core.IServices;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Enums.Business;
 using GymMangamentSystem.Core.Errors;
@@ -17,9 +19,9 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class BMIRecordRepo : IBMIRecordRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
 
-        public BMIRecordRepo(AppDBContext context, IMapper mapper)
+        public BMIRecordRepo(AppDBContext context, IAppMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -30,7 +32,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             {
                 if (bmiRecordDto.WeightInKg <= 0 || bmiRecordDto.HeightInMeters <= 0)
                 {
-                    return new ApiResponse(200, "Weight and height must be greater than 0.");
+                    return new ApiResponse(400, "Weight and height must be greater than 0.");
                 }
 
                 var bmiRecord = _mapper.Map<BMIRecord>(bmiRecordDto);
@@ -49,15 +51,14 @@ namespace GymMangamentSystem.Reposatory.Services.Business
         }
         public async Task<ApiResponse> DeleteBMIRecord(int id)
         {
-            var existingBMIRecord = await _context.bMIRecords.FindAsync(id);
+            var existingBMIRecord = await _context.BMIRecords.FindAsync(id);
             if (existingBMIRecord == null || existingBMIRecord.IsDeleted == true)
             {
                 return new ApiResponse(404, "BMI record not found");
             }
             try
             {
-                existingBMIRecord.IsDeleted = true;
-                _context.Update(existingBMIRecord);
+                _context.BMIRecords.Remove(existingBMIRecord);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "BMI record deleted successfully");
             }
@@ -66,12 +67,15 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(400, "Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<object>> GetBMIRecordsForUser(string userId)
+        public async Task<IEnumerable<object>> GetBMIRecordsForUser(string userId, PaginationParameters? pagination = null)
         {
             try
             {
-                var bmiRecords = await _context.bMIRecords
-                    .Where(x => x.UserId == userId && x.IsDeleted == false)
+                var bmiRecords = await _context.BMIRecords
+                    .AsNoTracking()
+                    .Where(x => x.UserId == userId)
+                    .OrderByDescending(x => x.MeasurementDate)
+                    .ApplyPagination(pagination)
                     .Select(x => new
                     {
                         id = x.BMIRecordId,

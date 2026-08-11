@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class MealRepo : IMealRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public MealRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public MealRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -76,11 +77,11 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<MealDto>> GetAllMeals()
+        public async Task<IEnumerable<MealDto>> GetAllMeals(PaginationParameters? pagination = null)
         {
             try
             {
-                var meals =await _context.Meals.ToListAsync();
+                var meals = await _context.Meals.AsNoTracking().OrderBy(x => x.MealId).ApplyPagination(pagination).ToListAsync();
                 var mappedMeals = _mapper.Map<IEnumerable<MealDto>>(meals);
                 return mappedMeals;
             }
@@ -89,11 +90,12 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<MealDto> GetMealById(int id)
+        public async Task<MealDto?> GetMealById(int id)
         {
             try
             {
-                var meal =await _context.Meals.FirstOrDefaultAsync(x => x.MealId == id);
+                var meal = await _context.Meals.AsNoTracking().FirstOrDefaultAsync(x => x.MealId == id);
+                if (meal is null) return null;
                 var mappedMeal = _mapper.Map<MealDto>(meal);
                 return mappedMeal;
             }

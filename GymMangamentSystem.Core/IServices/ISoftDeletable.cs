@@ -9,6 +9,6 @@ namespace GymMangamentSystem.Core.IServices
     public interface ISoftDeletable
     {
         bool IsDeleted { get; set; }
-        DateTime? DeletedOnUtc { get; set; }
+        DateTime? DeletedAt { get; set; }
     }
 }

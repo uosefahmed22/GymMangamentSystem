@@ -1,4 +1,4 @@
-﻿using GymMangamentSystem.Core.Models.Business;
+using GymMangamentSystem.Core.Models.Business;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,7 +26,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
 
             builder.Property(b => b.MeasurementDate)
                 .IsRequired()
-                .HasDefaultValueSql("GETDATE()");
+                .HasDefaultValueSql("GETUTCDATE()");
 
             builder.Property(b => b.IsDeleted)
                 .IsRequired()
@@ -48,7 +48,7 @@ namespace GymMangamentSystem.Reposatory.Data.Configurations
 
             builder.HasQueryFilter(b => !b.IsDeleted);
 
-            builder.HasIndex(b => b.UserId);
+            builder.HasIndex(b => new { b.UserId, b.MeasurementDate });
         }
     }
 

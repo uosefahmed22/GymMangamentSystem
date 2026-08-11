@@ -1,9 +1,10 @@
-﻿using System;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Reposatory.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices;
@@ -17,10 +18,10 @@ namespace GymMangamentSystem.Reposatory.Services.Business
     public class NutritionPlanRepo : INutritionPlanRepo
     {
         private readonly AppDBContext _context;
-        private readonly IMapper _mapper;
+        private readonly IAppMapper _mapper;
         private readonly IImageService _imageService;
 
-        public NutritionPlanRepo(AppDBContext context, IMapper mapper, IImageService fileService)
+        public NutritionPlanRepo(AppDBContext context, IAppMapper mapper, IImageService fileService)
         {
             _context = context;
             _mapper = mapper;
@@ -66,7 +67,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
             }
             try
             {
-                nutritionPlan.IsDeleted = true;
+                _context.NutritionPlans.Remove(nutritionPlan);
                 await _context.SaveChangesAsync();
                 return new ApiResponse(200, "Nutrition Plan deleted successfully");
             }
@@ -75,7 +76,7 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 return new ApiResponse(500, "Error: " + ex.Message);
             }
         }
-        public async Task<NutritionPlanDto> GetNutritionPlan(int nutritionPlanId)
+        public async Task<NutritionPlanDto?> GetNutritionPlan(int nutritionPlanId)
         {
             var nutritionPlan = await _context.NutritionPlans.FirstOrDefaultAsync(x => x.NutritionPlanId == nutritionPlanId);
             try
@@ -92,9 +93,9 @@ namespace GymMangamentSystem.Reposatory.Services.Business
                 throw new Exception("Error: " + ex.Message);
             }
         }
-        public async Task<IEnumerable<NutritionPlanDto>> GetNutritionPlans()
+        public async Task<IEnumerable<NutritionPlanDto>> GetNutritionPlans(PaginationParameters? pagination = null)
         {
-            var nutritionPlans = await _context.NutritionPlans.Where(x => !x.IsDeleted).ToListAsync();
+            var nutritionPlans = await _context.NutritionPlans.AsNoTracking().OrderBy(x => x.NutritionPlanId).ApplyPagination(pagination).ToListAsync();
             try
             {
                 var nutritionPlansDto = _mapper.Map<IEnumerable<NutritionPlanDto>>(nutritionPlans);

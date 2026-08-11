@@ -1,5 +1,6 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
+using GymMangamentSystem.Core.Models.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace GymMangamentSystem.Core.IServices.Business
         Task<ApiResponse> CreateWorkoutPlan(WorkoutPlanDto workoutPlanDto);
         Task<ApiResponse> UpdateWorkoutPlan(int id, WorkoutPlanDto workoutPlanDto);
         Task<ApiResponse> DeleteWorkoutPlan(int workoutPlanId);
-        Task<WorkoutPlanDto> GetWorkoutPlan(int workoutPlanId);
-        Task<IEnumerable<WorkoutPlanDto>> GetWorkoutPlans();
+        Task<WorkoutPlanDto?> GetWorkoutPlan(int workoutPlanId);
+        Task<IEnumerable<WorkoutPlanDto>> GetWorkoutPlans(PaginationParameters? pagination = null);
     }
 }

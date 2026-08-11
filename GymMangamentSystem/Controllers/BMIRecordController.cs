@@ -1,4 +1,5 @@
-﻿using GymMangamentSystem.Core.Dtos.Business;
+using GymMangamentSystem.Core.Models.Common;
+using GymMangamentSystem.Core.Dtos.Business;
 using GymMangamentSystem.Core.Errors;
 using GymMangamentSystem.Core.IServices.Business;
 using GymMangamentSystem.Core.Models.Business;
@@ -20,7 +21,7 @@ namespace GymMangamentSystem.Apis.Controllers
         }
         [Authorize]
         [HttpGet("getBMIRecordsForUser")]
-        public async Task<IActionResult> GetBMIRecordsForUser()
+        public async Task<IActionResult> GetBMIRecordsForUser([FromQuery] PaginationParameters pagination)
         {
             try
             {
@@ -33,7 +34,7 @@ namespace GymMangamentSystem.Apis.Controllers
                 {
                     return BadRequest("UserIdClaim claim not found in the token");
                 }
-                var result = await _bMIRecordRepo.GetBMIRecordsForUser(UserIdClaim.Value);
+                var result = await _bMIRecordRepo.GetBMIRecordsForUser(UserIdClaim.Value, pagination);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -59,7 +60,9 @@ namespace GymMangamentSystem.Apis.Controllers
                 bmiRecord.UserId = UserIdClaim.Value;
 
                 var result = await _bMIRecordRepo.AddBMIRecord(bmiRecord);
-                return Ok(result);
+                return StatusCode(
+                    result.StatusCode ?? StatusCodes.Status500InternalServerError,
+                    result);
             }
             catch (Exception ex)
             {
@@ -77,7 +80,9 @@ namespace GymMangamentSystem.Apis.Controllers
                     return BadRequest(ModelState);
                 }
                 var result = await _bMIRecordRepo.DeleteBMIRecord(id);
-                return Ok(result);
+                return StatusCode(
+                    result.StatusCode ?? StatusCodes.Status500InternalServerError,
+                    result);
             }
             catch (Exception ex)
             {
