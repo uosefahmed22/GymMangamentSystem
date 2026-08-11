@@ -1,46 +1,104 @@
 # Gym Management API
 
-ASP.NET Core 8 Web API for gym memberships, classes, attendance, workout and nutrition plans, meals, BMI tracking, feedback, notifications, and Identity-based authentication.
+Tested ASP.NET Core 8 Web API for gym operations, member services, training plans, nutrition, and identity workflows.
 
-## Architecture
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![API](https://img.shields.io/badge/HTTP_actions-64-blue)](#api-modules)
+[![Tests](https://img.shields.io/badge/tests-106%20passing-brightgreen)](#automated-tests)
+[![SQL Server](https://img.shields.io/badge/SQL_Server-EF_Core-CC2927?logo=microsoftsqlserver)](https://learn.microsoft.com/ef/core/)
 
-The repository uses a pragmatic three-layer (N-Tier) structure:
+## Overview
 
-- `GymMangamentSystem` — API controllers, middleware, configuration, Swagger, CORS, and dependency injection.
-- `GymMangamentSystem.Core` — entities, DTOs, enums, interfaces, validation models, and shared contracts.
-- `GymMangamentSystem.Reposatory` — EF Core persistence, business repositories, authentication services, email, mapping, migrations, and interceptors.
-- `GymMangamentSystem.UnitTests` — isolated unit tests using xUnit and test doubles.
-- `GymMangamentSystem.IntegrationTests` — SQL Server/LocalDB integration tests for EF Core behavior.
+Gym Management API is an independent backend project covering the main workflows of a gym: memberships, attendance, classes, workout and nutrition plans, meals, exercises, BMI records, feedback, and notifications.
 
-This is N-Tier architecture, not a strict Clean Architecture implementation.
+The project emphasizes explicit application mapping, secure token handling, soft-delete behavior, paginated queries, structured logging, and automated testing. Its 14 controllers currently expose **64 HTTP actions**.
 
 ## Main Features
 
-- ASP.NET Core Identity with JWT access tokens and rotating refresh tokens.
-- Role-based authorization.
-- Email confirmation, OTP password reset, and SMTP email delivery.
-- Soft delete through an EF Core `SaveChangesInterceptor` and global query filters.
-- Explicit application mapper with no AutoMapper runtime or license dependency.
-- Paginated read endpoints using `pageNumber` and `pageSize` (default 20, maximum 100).
-- No-tracking EF Core list queries and indexes for frequent lookups.
-- Swagger/OpenAPI with Bearer authentication support.
-- Structured request/application logging through Serilog (console and 14-day rolling files).
-- Cloudinary image upload integration.
+- ASP.NET Core Identity with role-based authorization.
+- JWT access tokens and rotating refresh tokens.
+- Registration, email confirmation, password changes, OTP reset, token refresh, and revocation.
+- Membership, attendance, class, exercise, workout, meal, and nutrition-plan management.
+- BMI history and category calculation.
+- Feedback and member notification workflows.
+- Cloudinary image uploads and SMTP email delivery.
+- Soft delete through an EF Core interceptor and global query filters.
+- Pagination with guarded page sizes, no-tracking reads, and lookup indexes.
+- Serilog console and rolling-file logs.
+- Swagger/OpenAPI with Bearer-token support.
 
-## Requirements
+## Architecture
+
+This repository uses a pragmatic N-Tier architecture rather than claiming strict Clean Architecture:
+
+```text
+GymMangamentSystem
+    API controllers, middleware, configuration, Swagger and composition root
+        |
+GymMangamentSystem.Core
+    Entities, DTOs, enums, interfaces and shared contracts
+        |
+GymMangamentSystem.Reposatory
+    EF Core, repositories, auth services, mapping, migrations and interceptors
+
+GymMangamentSystem.UnitTests
+GymMangamentSystem.IntegrationTests
+```
+
+## Tech Stack
+
+| Area | Technology |
+| --- | --- |
+| Runtime | .NET 8, ASP.NET Core Web API |
+| Persistence | Entity Framework Core, SQL Server |
+| Identity | ASP.NET Core Identity, JWT, rotating refresh tokens, RBAC |
+| Observability | Serilog console and rolling files |
+| Integrations | MailKit/SMTP, Otp.NET, Cloudinary |
+| API docs | Swagger/OpenAPI |
+| Testing | xUnit, SQL Server LocalDB integration tests, coverlet collector |
+
+## Project Structure
+
+```text
+GymMangamentSystem/
+|-- GymMangamentSystem/                  # API host and controllers
+|-- GymMangamentSystem.Core/             # Domain models and contracts
+|-- GymMangamentSystem.Reposatory/       # Persistence and service implementations
+|-- GymMangamentSystem.UnitTests/        # Isolated unit tests
+|-- GymMangamentSystem.IntegrationTests/ # SQL Server integration tests
+`-- GymMangamentSystem.sln
+```
+
+The `Reposatory` spelling is retained because it is part of the existing solution and project names.
+
+## Getting Started
+
+### Requirements
 
 - .NET 8 SDK
-- SQL Server or SQL Server LocalDB
-- SMTP account for email features
-- Cloudinary account for image features
+- SQL Server
+- SQL Server LocalDB on Windows to run the current integration suite
+- SMTP credentials for email features
+- Cloudinary credentials for image features
+- EF Core CLI tools
 
-## Local Configuration
-
-Secrets must not be committed to `appsettings*.json`. Initialize local User Secrets from the API project:
+### 1. Clone and restore
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<connection-string>" --project GymMangamentSystem
-dotnet user-secrets set "JWT:Key" "<at-least-32-byte-secret>" --project GymMangamentSystem
+git clone https://github.com/uosefahmed22/GymMangamentSystem.git
+cd GymMangamentSystem
+dotnet restore
+```
+
+### 2. Configure local secrets
+
+Safe placeholders and non-secret options are documented in `GymMangamentSystem/appsettings.Example.json`. Configure sensitive values with .NET User Secrets:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnections" "<connection-string>" --project GymMangamentSystem
+dotnet user-secrets set "JWT:Key" "<at-least-32-character-secret>" --project GymMangamentSystem
+dotnet user-secrets set "JWT:ValidIssuer" "<issuer>" --project GymMangamentSystem
+dotnet user-secrets set "JWT:ValidAudience" "<audience>" --project GymMangamentSystem
 dotnet user-secrets set "MailSettings:Email" "<smtp-email>" --project GymMangamentSystem
 dotnet user-secrets set "MailSettings:Password" "<smtp-password>" --project GymMangamentSystem
 dotnet user-secrets set "CloudinarySetting:CloudName" "<cloud-name>" --project GymMangamentSystem
@@ -48,48 +106,59 @@ dotnet user-secrets set "CloudinarySetting:ApiKey" "<api-key>" --project GymMang
 dotnet user-secrets set "CloudinarySetting:ApiSecret" "<api-secret>" --project GymMangamentSystem
 ```
 
-Safe non-secret values and placeholders are documented in `GymMangamentSystem/appsettings.Example.json`. Configure `ClientSettings:AllowedOrigins` with the real frontend origins and `ClientSettings:EmailConfirmationRedirectUrl` with the frontend confirmation page.
+Configure `ClientSettings:AllowedOrigins` and `ClientSettings:EmailConfirmationRedirectUrl` for the frontend environment.
 
-## Run the Project
+### 3. Apply migrations and run
 
 ```powershell
-dotnet restore
 dotnet ef database update --project GymMangamentSystem.Reposatory --startup-project GymMangamentSystem
 dotnet run --project GymMangamentSystem
 ```
 
-Swagger is available from the URL printed by the application in Development.
+Local launch profiles use `https://localhost:7187` and `http://localhost:5159`. Swagger is available at `/swagger` in Development.
 
-## Run the Tests
+## API Modules
 
-```powershell
-dotnet test GymMangamentSystem.sln
-```
+| Module | Responsibility |
+| --- | --- |
+| Account and Auth | Identity lifecycle, login, refresh and revoke flows |
+| Attendance and Memberships | Member access and membership records |
+| Classes | Class scheduling and management |
+| Exercises and Categories | Exercise library organization |
+| Workouts and Nutrition | Member plans, meals and meal categories |
+| BMI Records | Measurement history and BMI categorization |
+| Feedback and Notifications | Member communication workflows |
 
-Current automated suite: 103 unit test cases and 3 integration tests (106 total). Integration tests require SQL Server LocalDB and create isolated temporary databases that are deleted after each test.
-
-## Pagination
-
-Collection endpoints accept query parameters:
+Collection endpoints accept pagination parameters:
 
 ```text
 ?pageNumber=1&pageSize=20
 ```
 
-Invalid page sizes are clamped to 1–100 and page numbers below 1 are treated as page 1.
+Page size is limited to the range 1-100.
 
-## Database Migrations
-
-The latest migrations activate production soft delete fields and add lookup/performance indexes. Review generated SQL before applying migrations to production:
+## Automated Tests
 
 ```powershell
-dotnet ef migrations script --idempotent --project GymMangamentSystem.Reposatory --startup-project GymMangamentSystem
+dotnet test GymMangamentSystem.sln
 ```
 
-## Security Notes
+Current suite: **106 test cases**.
 
-- Passwords require at least 8 characters with upper/lowercase letters and a digit.
-- Accounts are locked for 15 minutes after 5 failed attempts.
-- CORS uses configured origins rather than `AllowAnyOrigin`.
-- JWT configuration fails fast when the signing key is missing or too short.
-- Previously exposed credentials must still be rotated at their providers, even after Git history is cleaned.
+- 103 unit test cases covering authentication services, refresh-token rotation, OTP behavior, mapping, models, controllers, and BMI logic.
+- 3 SQL Server/LocalDB integration tests covering repository and soft-delete behavior.
+
+Integration tests create isolated temporary databases and remove them after execution.
+
+## Database and Security Notes
+
+- Recent migrations activate soft-delete fields and add frequently used lookup indexes.
+- Password rules and lockout behavior are configured through ASP.NET Core Identity.
+- The application fails fast when the JWT signing key or required connection string is missing.
+- Use reviewed origins, HTTPS, a secrets provider, restricted database credentials, and an external logging target for production.
+- Rotate any credential that was previously exposed, even after removing it from Git history.
+
+## Author
+
+**Youssef Ahmed**
+[LinkedIn](https://www.linkedin.com/in/youssef-ahmed-eg/) | [GitHub](https://github.com/uosefahmed22) | [Portfolio](https://uosefahmed22.github.io/)
